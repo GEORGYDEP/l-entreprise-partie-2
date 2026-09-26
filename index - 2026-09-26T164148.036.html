@@ -1,0 +1,1700 @@
+<!DOCTYPE html>
+<html lang="fr-BE">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L'entreprise — Partie 2 · 3e P Vente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f1220; --bg2:#171b2e; --bg3:#0b0e19; --card:#1c2139;
+  --accent:#22d68a; --orange:#ff8a3d; --gold:#ffc940; --blue:#5aa9ff;
+  --text:#eef1ff; --text2:#a9b0cc; --text3:#6f7798; --border:#2b3252;
+  --success:#22d68a; --error:#ff4d6d; --radius:16px;
+  --font:'Outfit',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'Space Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:16px;line-height:1.5}
+body{min-height:100vh;background:radial-gradient(1200px 600px at 80% -10%,rgba(90,169,255,.10),transparent 60%),radial-gradient(900px 500px at -10% 110%,rgba(34,214,138,.08),transparent 60%),var(--bg)}
+button{font-family:inherit;color:inherit;cursor:pointer}
+b,strong{font-weight:700;color:#fff}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+/* ---------- HUD ---------- */
+.hud{position:sticky;top:0;z-index:100;background:rgba(15,18,32,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.hud-top{display:flex;align-items:center;gap:10px;padding:10px 16px;max-width:980px;margin:0 auto}
+.logo{font-size:1.5rem;line-height:1}
+.app-title{font-weight:800;font-size:1rem;white-space:nowrap}
+.app-title small{display:block;font-weight:500;font-size:.72rem;color:var(--text2)}
+.spacer{flex:1}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:999px;background:var(--bg2);border:1px solid var(--border);font-size:.85rem;font-weight:700;white-space:nowrap}
+.chip.xp{color:var(--gold)}
+.chip.streak.hot{border-color:var(--orange);color:var(--orange);animation:pulse 1s ease-in-out infinite}
+.icon-btn{background:var(--bg2);border:1px solid var(--border);border-radius:10px;width:36px;height:34px;font-size:1rem}
+.icon-btn:hover{border-color:var(--text3)}
+#globalTimer{font-family:var(--mono);font-size:.85rem;color:var(--text2)}
+.xpwrap{max-width:980px;margin:0 auto;padding:0 16px 8px}
+.xpline{display:flex;justify-content:space-between;font-size:.78rem;color:var(--text2);margin-bottom:4px;gap:8px}
+.xpline .rank{color:#fff;font-weight:700}
+.xpbar{position:relative;height:10px;border-radius:999px;background:var(--bg3);border:1px solid var(--border);overflow:visible}
+.xpfill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--gold));width:0;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.xpmark{position:absolute;top:-3px;width:2px;height:14px;background:var(--text3);border-radius:2px}
+.xpmark.reached{background:var(--gold)}
+.navpills{display:flex;gap:6px;justify-content:center;padding:0 16px 10px;max-width:980px;margin:0 auto}
+.navpill{min-width:34px;height:26px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);font-size:.8rem;font-weight:700;padding:0 8px}
+.navpill.done{background:rgba(34,214,138,.15);border-color:var(--accent);color:var(--accent)}
+.navpill.cur{border-color:var(--gold);color:var(--gold)}
+.navpill.locked{opacity:.4;cursor:not-allowed}
+
+main{max-width:980px;margin:0 auto;padding:22px 16px 80px}
+
+/* ---------- Boutons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 22px;border-radius:12px;border:none;font-weight:800;font-size:1rem;background:var(--accent);color:#0c1a13;transition:transform .12s,filter .12s}
+.btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none;filter:none}
+.btn.ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn.orange{background:var(--orange);color:#1e0f02}
+.btn.gold{background:var(--gold);color:#241a00}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:18px}
+.lb-btn{padding:10px 18px;border-radius:10px;font-weight:700;background:transparent}
+.lb-btn.app{border:1px solid var(--accent);color:var(--accent)}
+.lb-btn.glob{border:1px solid var(--orange);color:var(--orange)}
+.lb-btn.app:hover{background:var(--accent);color:#0c1a13}
+.lb-btn.glob:hover{background:var(--orange);color:#1e0f02}
+
+/* ---------- Accueil ---------- */
+.welcome{text-align:center;padding-top:10px}
+.chain{display:flex;justify-content:center;align-items:center;gap:8px;margin:6px 0 18px;flex-wrap:wrap}
+.chain .step{width:92px;padding:12px 6px;border-radius:14px;background:var(--card);border:1px solid var(--border)}
+.chain .step .e{font-size:2rem;display:block}
+.chain .step span{font-size:.72rem;color:var(--text2);font-weight:600}
+.chain .arrow{color:var(--text3);font-size:1.3rem}
+.welcome h1{font-size:2.3rem;font-weight:900;line-height:1.1;letter-spacing:-.5px}
+.welcome .sub{color:var(--text2);margin:8px auto 18px;max-width:520px}
+.stats{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:0 auto 16px;max-width:620px}
+.stat{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:8px 14px;font-size:.88rem}
+.stat b{font-size:1.05rem}
+.player{font-size:.85rem;color:var(--text2);margin-bottom:6px}
+.player b{color:var(--accent)}
+.howto{max-width:560px;margin:18px auto 0;text-align:left;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;font-size:.9rem;color:var(--text2)}
+.howto li{margin:4px 0 4px 18px}
+
+/* ---------- Parcours (hub) ---------- */
+.section-title{font-size:1.25rem;font-weight:800;margin:26px 0 14px}
+.path{position:relative;padding:6px 0}
+.path::before{content:"";position:absolute;left:50%;top:0;bottom:0;border-left:3px dashed var(--border);transform:translateX(-50%)}
+.prow{position:relative;display:flex;align-items:center;margin:0 0 22px;min-height:120px}
+.prow .node{position:absolute;left:50%;transform:translateX(-50%);width:46px;height:46px;border-radius:50%;background:var(--bg2);border:3px solid var(--border);font-weight:900;font-size:1.05rem;z-index:2;display:flex;align-items:center;justify-content:center}
+.prow .node.done{background:var(--accent);border-color:var(--accent);color:#0c1a13}
+.prow .node.todo{border-color:var(--gold);color:var(--gold);animation:pulse 1.4s ease-in-out infinite}
+.prow .node.locked{opacity:.5}
+.aisle{width:calc(50% - 44px);text-align:left;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 16px 14px;position:relative;transition:transform .15s,border-color .15s}
+.aisle:hover:not(.locked){transform:translateY(-2px);border-color:var(--text3)}
+.prow.left .aisle{margin-right:auto}
+.prow.right .aisle{margin-left:auto}
+.aisle.locked{opacity:.5;cursor:not-allowed}
+.aisle.todo{border-color:rgba(255,201,64,.6)}
+.aisle-sign{display:inline-block;background:var(--blue);color:#051326;font-weight:900;font-size:.78rem;padding:3px 10px;border-radius:6px;margin-bottom:8px}
+.aisle.done .aisle-sign{background:var(--accent);color:#0c1a13}
+.aisle h3{font-size:1.1rem;font-weight:800;display:flex;gap:8px;align-items:center}
+.aisle p{font-size:.86rem;color:var(--text2);margin:2px 0 8px}
+.aisle .meta{font-size:.82rem;font-weight:700;color:var(--gold)}
+.stars{color:var(--gold);letter-spacing:2px}
+.stars .off{color:var(--text3)}
+.trophies{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.trophy{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;text-align:center}
+.trophy .ti{font-size:1.9rem;display:block}
+.trophy b{display:block;font-size:.9rem;margin-top:2px}
+.trophy small{display:block;color:var(--text2);font-size:.75rem;line-height:1.3;margin-top:3px}
+.trophy.off{opacity:.45;filter:grayscale(1)}
+.trophy.on{border-color:var(--gold);box-shadow:0 0 0 1px rgba(255,201,64,.25) inset}
+
+/* ---------- Briefing ---------- */
+.panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px}
+.brief-head{display:flex;gap:14px;align-items:center;margin-bottom:14px}
+.brief-head .big{font-size:2.6rem}
+.brief-head h2{font-size:1.5rem;font-weight:900;line-height:1.15}
+.brief-head .meta{font-size:.85rem;color:var(--text2)}
+.goals{background:rgba(34,214,138,.07);border:1px solid rgba(34,214,138,.3);border-radius:12px;padding:12px 16px;margin-bottom:14px}
+.goals h4,.box h4{font-size:.92rem;margin-bottom:6px}
+.goals li{margin-left:20px;font-size:.93rem}
+.rappel{font-size:.98rem;margin-bottom:12px}
+.rappel p{margin-bottom:8px}
+.box{border-radius:12px;padding:12px 16px;margin:12px 0;font-size:.93rem}
+.box.ex{background:rgba(255,138,61,.08);border:1px solid rgba(255,138,61,.4)}
+.box.truc{background:rgba(90,169,255,.08);border:1px solid rgba(90,169,255,.4)}
+.box.plus{background:rgba(255,201,64,.07);border:1px dashed rgba(255,201,64,.5)}
+.box.plus h4::after{content:" (pas noté)";font-weight:400;color:var(--text2);font-size:.8rem}
+.schema{display:block;width:100%;max-width:620px;margin:8px auto 4px}
+.predict{margin-top:18px;text-align:center}
+.predict p{font-weight:700;margin-bottom:8px}
+.pred-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.pred{padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:var(--bg2);font-weight:700}
+.pred.sel{border-color:var(--gold);background:rgba(255,201,64,.12);color:var(--gold)}
+
+/* ---------- Question ---------- */
+.qhead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.qhead .where{font-size:.85rem;color:var(--text2);font-weight:600}
+.qpills{display:flex;gap:6px}
+.qpill{width:14px;height:14px;border-radius:50%;background:var(--bg3);border:2px solid var(--border)}
+.qpill.cur{border-color:var(--gold);background:var(--gold)}
+.qpill.correct{background:var(--success);border-color:var(--success)}
+.qpill.hint{background:var(--orange);border-color:var(--orange)}
+.qpill.shown{background:var(--error);border-color:var(--error)}
+.qcard{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px}
+.tag{display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:#241a00;font-weight:800;font-size:.78rem;padding:4px 12px 4px 18px;border-radius:4px 10px 10px 4px;position:relative;margin-bottom:12px}
+.tag::before{content:"";position:absolute;left:6px;top:50%;width:6px;height:6px;border-radius:50%;background:var(--card);transform:translateY(-50%)}
+.prompt{font-size:1.12rem;font-weight:600;margin-bottom:14px}
+.data{display:block;background:var(--bg3);border:1px solid var(--border);border-left:4px solid var(--blue);border-radius:10px;padding:10px 14px;margin:0 0 14px;font-size:.95rem}
+.opts{display:grid;gap:10px}
+.opt{text-align:left;padding:13px 16px;border-radius:12px;border:1px solid var(--border);background:var(--bg2);font-size:1rem;font-weight:500;transition:border-color .12s,background .12s}
+.opt:hover:not(:disabled){border-color:var(--text3)}
+.opt.sel{border-color:var(--gold);background:rgba(255,201,64,.10)}
+.opt.good{border-color:var(--success);background:rgba(34,214,138,.14)}
+.opt.bad{border-color:var(--error);background:rgba(255,77,109,.12);opacity:.85}
+.opt.missed{border:2px dashed var(--success)}
+.opt:disabled{cursor:default}
+.vf-row{display:flex;gap:12px}
+.vf-row .opt{flex:1;text-align:center;font-weight:800;font-size:1.1rem}
+.winput{width:100%;padding:13px 16px;border-radius:12px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:1.1rem;font-family:inherit}
+.winput.good{border-color:var(--success)}
+.winput.bad{border-color:var(--error)}
+.instr{font-size:.85rem;color:var(--text2);margin:-6px 0 12px}
+/* éléments */
+.reserve{display:flex;flex-wrap:wrap;gap:8px;min-height:48px;padding:10px;border-radius:12px;border:1px dashed var(--border);background:var(--bg3);margin-bottom:14px}
+.reserve:empty::after{content:"Toutes les étiquettes sont placées.";color:var(--text3);font-size:.85rem;align-self:center}
+.chipel{padding:9px 13px;border-radius:10px;border:1px solid var(--border);background:var(--bg2);font-size:.93rem;font-weight:600;text-align:left}
+.chipel.sel{border-color:var(--gold);background:rgba(255,201,64,.14);box-shadow:0 0 0 2px rgba(255,201,64,.25)}
+.chipel.ok1{border-color:var(--success);background:rgba(34,214,138,.14);cursor:default}
+.chipel.ok2{border-color:var(--orange);background:rgba(255,138,61,.14);cursor:default}
+.chipel.ko{border-color:var(--error);background:rgba(255,77,109,.12);cursor:default}
+.chipel .fix{display:block;font-size:.8rem;color:var(--gold);font-weight:700;margin-top:3px}
+.zones{display:grid;gap:10px}
+.zones.z3{grid-template-columns:repeat(3,1fr)}
+.zones.z2{grid-template-columns:repeat(2,1fr)}
+.zone{border:2px solid var(--border);border-radius:14px;background:var(--bg2);padding:10px;min-height:140px;display:flex;flex-direction:column;gap:6px;text-align:left}
+.zone.target{border-color:var(--gold);border-style:dashed}
+.zone-h{font-weight:800;font-size:.95rem}
+.zone-h small{display:block;font-weight:500;color:var(--text2);font-size:.75rem}
+.match-row{display:grid;grid-template-columns:minmax(120px,190px) 1fr;gap:10px;align-items:center;margin-bottom:10px}
+.match-row .term{font-weight:800}
+.match-row select{width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-family:inherit;font-size:.93rem}
+.match-row select.ok1{border-color:var(--success)}
+.match-row select.ok2{border-color:var(--orange)}
+.match-row select.ko{border-color:var(--error)}
+.match-fix{grid-column:2;font-size:.82rem;color:var(--gold);font-weight:700;margin-top:-6px}
+.slots{display:grid;gap:8px;margin-bottom:14px}
+.slot{display:flex;align-items:center;gap:10px;text-align:left;padding:10px 12px;border-radius:12px;border:1px dashed var(--border);background:var(--bg2);min-height:50px;font-size:.95rem;font-weight:600}
+.slot .n{flex:0 0 30px;height:30px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--gold)}
+.slot .empty{color:var(--text3);font-weight:500}
+.slot.filled{border-style:solid}
+.slot.ok1{border-color:var(--success);background:rgba(34,214,138,.12);cursor:default}
+.slot.ok2{border-color:var(--orange);background:rgba(255,138,61,.12);cursor:default}
+.slot.ko{border-color:var(--error);background:rgba(255,77,109,.10);cursor:default}
+.slot .fix{display:block;font-size:.8rem;color:var(--gold);font-weight:700}
+.gaptext{font-size:1.05rem;line-height:2.3;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px}
+.gap{display:inline-block;min-width:110px;padding:0 10px;margin:0 2px;border:none;border-bottom:2px solid var(--text3);background:var(--bg3);border-radius:6px 6px 0 0;font-weight:700;font-size:1rem;line-height:1.8;color:var(--text)}
+.gap.active{border-bottom-color:var(--gold);background:rgba(255,201,64,.12)}
+.gap.ok1{border-bottom-color:var(--success);color:var(--success);cursor:default}
+.gap.ok2{border-bottom-color:var(--orange);color:var(--orange);cursor:default}
+.gap.ko{border-bottom-color:var(--error);color:var(--error);cursor:default}
+.gap .fix{color:var(--gold);font-size:.85rem;margin-left:4px}
+.hunt-doc{background:#f7f5ee;color:#1d1d1d;border-radius:12px;padding:16px;margin-bottom:12px;box-shadow:0 6px 20px rgba(0,0,0,.3)}
+.hunt-doc h4{font-size:.95rem;margin-bottom:8px;color:#1d1d1d}
+.hsent{display:block;width:100%;text-align:left;padding:9px 12px;margin:4px 0;border-radius:8px;border:1px solid transparent;background:transparent;color:#1d1d1d;font-size:.98rem}
+.hsent:hover:not(:disabled){background:rgba(0,0,0,.05)}
+.hsent.flag{background:rgba(255,201,64,.35);border-color:#c79400}
+.hsent.ok1{background:rgba(34,214,138,.25);border-color:#159a61;cursor:default}
+.hsent.ok2{background:rgba(255,138,61,.25);border-color:#c65d17;cursor:default}
+.hsent.ko{background:rgba(255,77,109,.22);border-color:#c22746;cursor:default}
+.hsent.alarm{animation:shake .4s}
+.hsent .fix{display:block;font-size:.84rem;font-weight:700;color:#7a4b00;margin-top:3px}
+.hsent:disabled{cursor:default}
+.hcount{font-size:.88rem;color:var(--text2);margin-bottom:6px}
+/* feedback */
+.fb{margin-top:16px;border-radius:12px;padding:12px 16px;font-size:.96rem;animation:slideUp .25s ease-out}
+.fb-ok{background:rgba(34,214,138,.10);border:1px solid rgba(34,214,138,.45)}
+.fb-hint{background:rgba(255,138,61,.10);border:1px solid rgba(255,138,61,.45)}
+.fb-ko{background:rgba(255,77,109,.09);border:1px solid rgba(255,77,109,.4)}
+.fb b.t{display:block;margin-bottom:3px}
+.qactions{display:flex;justify-content:flex-end;gap:10px;margin-top:16px;flex-wrap:wrap}
+
+/* ---------- Bilans ---------- */
+.medal{font-size:3.6rem;text-align:center;line-height:1}
+.grade{text-align:center;font-size:1.4rem;font-weight:900;margin-top:4px}
+.grade small{display:block;font-size:.9rem;font-weight:500;color:var(--text2)}
+.legend{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;font-size:.82rem;color:var(--text2);margin:14px 0 8px}
+.dot{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.dot.g{background:var(--success)}.dot.o{background:var(--orange)}.dot.r{background:var(--error)}
+table.recap{width:100%;border-collapse:collapse;font-size:.9rem;margin-top:8px}
+table.recap th,table.recap td{padding:8px 6px;border-bottom:1px solid var(--border);text-align:left}
+table.recap th{color:var(--text2);font-size:.78rem;font-weight:700}
+table.recap td.n{text-align:center;font-weight:700}
+.predline{margin-top:14px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 16px;font-size:.93rem}
+.kpis{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:12px 0}
+.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:8px 14px;text-align:center;min-width:110px}
+.kpi b{display:block;font-size:1.2rem}
+.kpi span{font-size:.75rem;color:var(--text2)}
+.crit{border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-top:12px;background:var(--bg2)}
+.crit-h{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap;font-weight:800}
+.ind{padding:8px 0 8px 12px;border-left:3px solid var(--border);margin-top:8px;font-size:.92rem}
+.ind.atteint{border-left-color:var(--success)}
+.ind.encours{border-left-color:var(--orange)}
+.ind.nonatteint{border-left-color:var(--error)}
+.status{font-size:.8rem;font-weight:800;white-space:nowrap}
+.status.atteint{color:var(--success)}.status.encours{color:var(--orange)}.status.nonatteint{color:var(--error)}
+.revoir{font-size:.85rem;color:var(--text2);margin-top:4px}
+.revoir i{color:var(--gold);font-style:normal;font-weight:700}
+.final{border:1px solid var(--gold);box-shadow:0 0 30px rgba(255,201,64,.08)}
+.print-head{display:none}
+
+/* ---------- Modals & effets ---------- */
+.overlay{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center}
+.rankcard{position:relative;z-index:2;background:var(--bg2);border:2px solid var(--gold);border-radius:20px;padding:30px 34px;text-align:center;max-width:380px;width:90%;animation:popIn .5s cubic-bezier(.2,1.4,.4,1)}
+.rankcard .ri{font-size:4.2rem;display:block}
+.rankcard h3{font-size:1.1rem;color:var(--gold);font-weight:800}
+.rankcard h2{font-size:1.7rem;font-weight:900;margin:4px 0 8px}
+.rankcard p{color:var(--text2);font-size:.92rem;margin-bottom:16px}
+.rays{position:absolute;width:900px;height:900px;left:50%;top:50%;margin:-450px 0 0 -450px;background:repeating-conic-gradient(rgba(255,201,64,.10) 0 10deg,transparent 10deg 20deg);border-radius:50%;animation:spin 14s linear infinite;z-index:1;pointer-events:none}
+.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,200%);opacity:0;pointer-events:none;z-index:9000;background:var(--bg2);border:1px solid var(--gold);border-radius:14px;padding:10px 18px;display:flex;align-items:center;gap:12px;box-shadow:0 10px 30px rgba(0,0,0,.5);transition:transform .35s cubic-bezier(.2,1.2,.4,1),opacity .25s;max-width:92vw}
+.toast.show{transform:translate(-50%,0);opacity:1}
+.toast .ti{font-size:2rem}
+.toast small{display:block;color:var(--gold);font-weight:800;font-size:.72rem}
+.combo{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%);z-index:8000;font-size:2.2rem;font-weight:900;color:var(--orange);text-shadow:0 0 20px rgba(255,138,61,.6);pointer-events:none;animation:comboPop 1.1s ease-out forwards;white-space:nowrap}
+.particle{position:fixed;width:8px;height:8px;border-radius:50%;z-index:8500;pointer-events:none}
+.floatxp{position:fixed;z-index:8600;font-weight:900;color:var(--gold);font-size:1.2rem;pointer-events:none;animation:floatUp 1s ease-out forwards;text-shadow:0 2px 8px rgba(0,0,0,.6)}
+.confetti{position:fixed;top:-12px;width:9px;height:14px;z-index:9500;pointer-events:none;animation:fall linear forwards}
+.shake{animation:shake .45s}
+.bounce{animation:bounce .5s}
+
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,201,64,.45)}50%{box-shadow:0 0 0 7px rgba(255,201,64,0)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+@keyframes bounce{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes popIn{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:scale(1)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes comboPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}25%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}70%{opacity:1}100%{opacity:0;transform:translate(-50%,-80%) scale(1)}}
+@keyframes floatUp{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-60px)}}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+@keyframes lbSlide{from{opacity:0;transform:translate(-50%,-45%)}to{opacity:1;transform:translate(-50%,-50%)}}
+
+@media (max-width:768px){
+  .zones.z3{grid-template-columns:1fr}
+  .welcome h1{font-size:1.9rem}
+}
+@media (max-width:480px){
+  .app-title{display:none}
+  .chip{padding:4px 7px;font-size:.78rem}
+  .hud-top{gap:6px;padding:8px 10px}
+  .icon-btn{width:32px}
+  .path::before{left:22px}
+  .prow .node{left:22px}
+  .aisle{width:calc(100% - 56px);margin-left:56px !important}
+  .zones.z2{grid-template-columns:1fr}
+  .match-row{grid-template-columns:1fr}
+  .match-fix{grid-column:1}
+  .qcard,.panel{padding:16px}
+  .vf-row{flex-direction:column}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
+}
+@media print{
+  body{background:#fff}
+  body *{visibility:hidden}
+  .fiche,.fiche *{visibility:visible}
+  .fiche{position:absolute;left:0;top:0;width:100%;background:#fff !important;color:#000 !important;border:none !important;box-shadow:none !important}
+  .fiche *{color:#000 !important;background:transparent !important}
+  .fiche .no-print{display:none !important}
+  .fiche .print-head{display:block;margin-bottom:12px}
+}
+</style>
+</head>
+<body>
+
+<header class="hud">
+  <div class="hud-top">
+    <span class="logo" aria-hidden="true">🛒</span>
+    <div class="app-title">L'entreprise — Partie 2<small>3e P Vente</small></div>
+    <div class="spacer"></div>
+    <span id="globalTimer" style="display:none;">⏱️ 00:00</span>
+    <span class="chip streak" id="hudStreak" title="Série de bonnes réponses du premier coup">🔥 0</span>
+    <span class="chip xp" id="hudXP">0 XP</span>
+    <button class="icon-btn" id="soundBtn" onclick="toggleSound()" aria-label="Activer le son" title="Son">🔇</button>
+    <button class="icon-btn" onclick="goHub()" aria-label="Voir le parcours" title="Parcours">🗺️</button>
+  </div>
+  <div class="xpwrap">
+    <div class="xpline"><span class="rank" id="hudRank">🎒 Stagiaire</span><span id="hudNext"></span></div>
+    <div class="xpbar" id="xpbar"><div class="xpfill" id="xpfill"></div></div>
+  </div>
+  <nav class="navpills" id="nav" aria-label="Missions"></nav>
+</header>
+
+<main id="main"></main>
+
+<!-- Montée en grade -->
+<div class="overlay" id="rankOverlay" role="dialog" aria-modal="true">
+  <div class="rays"></div>
+  <div class="rankcard" id="rankCard"></div>
+</div>
+
+<!-- Bandeau de badge -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- ===== MODAL EMAIL ===== -->
+<div id="emailOverlay" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);align-items:center;justify-content:center;">
+  <div style="background:var(--bg2,#1a1a2e);border:1px solid var(--border,#333);border-radius:16px;padding:32px;max-width:420px;width:90%;text-align:center;box-shadow:0 0 40px rgba(0,0,0,0.5);animation:slideUp .3s ease-out;">
+    <div style="font-size:2rem;margin-bottom:12px;">🎓</div>
+    <h2 style="font-size:1.3rem;margin-bottom:4px;">Identification</h2>
+    <p style="font-size:0.85rem;color:var(--text2,#999);margin-bottom:20px;">Entre ton adresse email scolaire pour commencer.</p>
+    <input type="email" id="emailInput" placeholder="prenom.nom@eleve.istlm.be"
+      style="width:100%;padding:12px 16px;border-radius:10px;border:1px solid var(--border,#333);background:var(--bg3,#111);color:var(--text,#eee);font-size:1rem;outline:none;margin-bottom:12px;font-family:inherit;"
+      onkeydown="if(event.key==='Enter')validateEmail()">
+    <div id="emailError" style="color:#ff4060;font-size:0.82rem;margin-bottom:12px;min-height:1.2em;"></div>
+    <button id="emailBtn" onclick="validateEmail()"
+      style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--accent,#22d68a);color:#0f1117;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity 0.2s;">
+      ✅ Vérifier et commencer
+    </button>
+  </div>
+</div>
+
+<!-- ===== MODAL CLASSEMENT ===== -->
+<div id="lbOverlay" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);" onclick="if(event.target===this)closeLB()">
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--bg2,#1a1a2e);border:1px solid var(--border,#333);border-radius:16px;padding:28px;width:95%;max-width:600px;max-height:85vh;overflow-y:auto;box-shadow:0 0 40px rgba(0,0,0,0.5);animation:lbSlide .3s ease-out;">
+    <button onclick="closeLB()" aria-label="Fermer" style="position:absolute;top:12px;right:12px;background:none;border:none;color:var(--text2,#999);font-size:1.5rem;cursor:pointer;">✕</button>
+    <h3 id="lbTitle" style="font-size:1.05rem;margin:0 30px 14px 0;"></h3>
+    <div style="display:flex;gap:8px;margin-bottom:20px;">
+      <button id="lbTabApp" onclick="switchLBTab('app')" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--accent,#22d68a);background:var(--accent,#22d68a);color:#0f1117;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.85rem;">🏆 Cette application</button>
+      <button id="lbTabGlobal" onclick="switchLBTab('global')" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--orange,#ff8a3d);background:transparent;color:var(--orange,#ff8a3d);font-weight:700;cursor:pointer;font-family:inherit;font-size:0.85rem;">🌍 Classement général</button>
+    </div>
+    <div id="lbContent"><div style="text-align:center;padding:40px;color:var(--text2,#999);">Chargement…</div></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   1. CRITÈRES ET INDICATEURS (CONVENTIONS §4.11)
+   Chapitres recopiés tels quels depuis le cours (aucun numéro).
+   ============================================================ */
+const CRITERES = [
+  { id:'C1', nom:"Situer une activité dans le bon secteur d'activité", indicateurs:[
+    { id:'I1', texte:"Je sais ce que fait chaque secteur : prendre dans la nature, transformer, rendre un service",
+      but:"dire ce que fait chaque secteur : prendre dans la nature, transformer ou rendre un service",
+      chapitre:"Les trois secteurs d'activité", revoir:"relis les trois phrases « Je prends dans la nature », « Je transforme », « Je rends un service » et le voyage de la tablette de chocolat." },
+    { id:'I2', texte:"Je classe une activité ou une entreprise dans le bon secteur",
+      but:"ranger une activité ou une entreprise dans le bon secteur",
+      chapitre:"Les trois secteurs d'activité", revoir:"relis les exemples de chaque secteur, surtout le piège : la construction fait partie du secteur secondaire." },
+    { id:'I3', texte:"J'utilise les mots du chapitre : matière première, produit fini, produit semi-fini…",
+      but:"utiliser les mots du chapitre : matière première, produit fini, produit semi-fini…",
+      chapitre:"Les trois secteurs d'activité — Les mots à connaître", revoir:"relis le tableau des mots à connaître, en particulier la différence entre produit fini et produit semi-fini." }
+  ]},
+  { id:'C2', nom:"Reconnaître qui dirige l'entreprise", indicateurs:[
+    { id:'I4', texte:"Je distingue une entreprise individuelle d'une société",
+      but:"reconnaître une entreprise individuelle et une société",
+      chapitre:"Qui dirige l'entreprise ?", revoir:"relis le tableau « L'entreprise individuelle / La société » et l'astuce du sigle placé après le nom." },
+    { id:'I5', texte:"Je connais les sigles SA, SRL et SC",
+      but:"expliquer les sigles SA, SRL et SC",
+      chapitre:"Qui dirige l'entreprise ?", revoir:"relis l'encadré « À toi de jouer » avec la signification des sigles SA, SRL et SC." }
+  ]}
+];
+
+/* ============================================================
+   2. CONTENU PÉDAGOGIQUE (LEVELS)
+   ============================================================ */
+const SCHEMA_SECTEURS = `
+<svg class="schema" viewBox="0 0 620 150" role="img" aria-label="Schéma : primaire, secondaire, tertiaire">
+  <defs><marker id="ar" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#6f7798"/></marker></defs>
+  <g font-family="Outfit, sans-serif" text-anchor="middle">
+    <rect x="10" y="15" width="170" height="120" rx="16" fill="rgba(34,214,138,.12)" stroke="#22d68a" stroke-width="2"/>
+    <text x="95" y="55" font-size="30">🌱</text>
+    <text x="95" y="85" font-size="17" font-weight="800" fill="#22d68a">PRIMAIRE</text>
+    <text x="95" y="110" font-size="13" fill="#eef1ff">« Je prends</text>
+    <text x="95" y="126" font-size="13" fill="#eef1ff">dans la nature »</text>
+    <line x1="185" y1="75" x2="218" y2="75" stroke="#6f7798" stroke-width="3" marker-end="url(#ar)"/>
+    <rect x="225" y="15" width="170" height="120" rx="16" fill="rgba(90,169,255,.12)" stroke="#5aa9ff" stroke-width="2"/>
+    <text x="310" y="55" font-size="30">🏭</text>
+    <text x="310" y="85" font-size="17" font-weight="800" fill="#5aa9ff">SECONDAIRE</text>
+    <text x="310" y="115" font-size="13" fill="#eef1ff">« Je transforme »</text>
+    <line x1="400" y1="75" x2="433" y2="75" stroke="#6f7798" stroke-width="3" marker-end="url(#ar)"/>
+    <rect x="440" y="15" width="170" height="120" rx="16" fill="rgba(255,138,61,.12)" stroke="#ff8a3d" stroke-width="2"/>
+    <text x="525" y="55" font-size="30">🛒</text>
+    <text x="525" y="85" font-size="17" font-weight="800" fill="#ff8a3d">TERTIAIRE</text>
+    <text x="525" y="110" font-size="13" fill="#eef1ff">« Je rends</text>
+    <text x="525" y="126" font-size="13" fill="#eef1ff">un service »</text>
+  </g>
+</svg>`;
+
+const LEVELS = [
+  /* ---------------- MISSION 1 ---------------- */
+  { id:'m1', icon:'🍟', title:"Le voyage de la frite", desc:"Du champ jusqu'au rayon : les trois secteurs",
+    inds:['I1','I3'],
+    brief:{
+      rappel:`<p>Tout ce que tu vendras en magasin a fait un <b>voyage</b> avant d'arriver dans le rayon. Ce voyage passe par <b>trois secteurs d'activité</b> :</p>${SCHEMA_SECTEURS}`,
+      exemple:`🍫 <b>La tablette de chocolat</b> : en Côte d'Ivoire, l'agriculteur récolte les fèves de <b>cacao</b> (c'est une <b>matière première</b>) → en Belgique, la chocolaterie fabrique les tablettes → au supermarché, le vendeur les met en rayon, conseille et encaisse.`,
+      truc:`Devant chaque activité, pose-toi une seule question : est-ce qu'on <b>prend</b> dans la nature, est-ce qu'on <b>transforme</b>, ou est-ce qu'on <b>rend un service</b> ?`,
+      plus:`En Belgique, environ <b>8 travailleurs sur 10</b> sont dans le secteur tertiaire. Les vendeurs en font partie : c'est là que tu travailleras plus tard !`
+    },
+    questions:[
+      { type:'order', ind:'I1', pts:8,
+        prompt:"Remets le voyage de la frite dans le bon ordre, du champ jusqu'au client.",
+        instr:"Clique sur une étiquette : elle va dans la première case libre. Attention, 2 étiquettes sont fausses et ne vont nulle part.",
+        steps:["🥔 L'agriculteur plante et récolte les pommes de terre dans son champ.",
+               "🏭 L'usine épluche, coupe et surgèle les frites.",
+               "🚚 Un camion livre les sacs de frites au supermarché.",
+               "🛒 Le vendeur met les frites en rayon et conseille le client."],
+        distractors:["🏭 L'usine plante les pommes de terre dans sa cour.",
+                     "🛒 Le vendeur transforme les pommes de terre en frites derrière la caisse."],
+        hint:"Commence par ce qui se passe dans la nature. Ensuite : qui transforme ? Et à la fin, qui rend un service au client ?",
+        explain:"C'est le chemin de presque tous les produits : on prend dans la nature (primaire), on transforme (secondaire), puis on transporte et on vend (tertiaire). Le camion et le vendeur ne fabriquent rien : ils rendent un service. Une usine ne plante rien, et un vendeur ne fabrique pas les frites." },
+
+      { type:'qcm', ind:'I1', pts:6,
+        prompt:"À Mouscron, une usine transforme du fil de coton en tissu pour fabriquer des jeans. Dans quel secteur travaille cette usine ?",
+        options:["Le secteur secondaire","Le secteur primaire","Le secteur tertiaire","Aucun secteur : une usine ne fait partie d'aucun secteur"],
+        correct:0,
+        hint:"Le coton a déjà été récolté dans un champ. Ici, on ne cultive rien. Alors, que fait-on avec ce coton ?",
+        ok:"L'usine prend une matière première (le coton) et la change en produit (le tissu, puis le jean). Changer une matière en produit, c'est « Je transforme » : le secteur secondaire.",
+        explain:"L'usine prend le coton et le change en tissu : elle transforme. C'est le secteur secondaire. Le primaire, ce serait l'agriculteur qui cultive le coton ; le tertiaire, le magasin qui vend les jeans." },
+
+      { type:'match', ind:'I3', pts:10,
+        prompt:"Relie chaque mot à sa définition.",
+        instr:"Choisis une définition dans chaque liste. Attention, il y a 2 définitions en trop.",
+        terms:[ {t:"Matière première", d:0}, {t:"Produit fini", d:1}, {t:"Produit semi-fini", d:2}, {t:"Pisciculture", d:3}, {t:"Sylviculture", d:4} ],
+        defs:["Richesse tirée de la nature, pas encore transformée",
+              "Produit prêt à être vendu au client",
+              "Produit qui devra encore être transformé",
+              "Élevage de poissons",
+              "Entretien et exploitation des forêts",
+              "Culture des légumes et des fleurs",
+              "Transformation du fer en acier"],
+        hint:"Pense à des exemples : le blé qui vient d'être récolté, une tablette de chocolat dans le rayon, une planche de bois qui deviendra une table… Et pour les mots en « -culture », cherche l'animal ou la plante qui se cache dedans.",
+        explain:"Matière première = pas encore transformée. Produit fini = prêt pour le client. Produit semi-fini = à transformer encore. Pisciculture : « pisci » fait penser à poisson. Sylviculture : « sylve » est un vieux mot pour la forêt." },
+
+      { type:'vf', ind:'I3', pts:4,
+        prompt:"Une tôle d'acier, qui servira à fabriquer une voiture, est un produit fini.",
+        answer:false,
+        explain:"Le client n'achète pas une tôle d'acier : elle doit encore être transformée pour devenir une voiture. C'est donc un <b>produit semi-fini</b>. La voiture, elle, sera le produit fini." },
+
+      { type:'multi', ind:'I1', pts:6,
+        prompt:"Coche toutes les activités où l'on prend quelque chose dans la nature.",
+        instr:"Il peut y avoir plusieurs bonnes réponses.",
+        items:[ {t:"🎣 Pêcher des poissons en mer du Nord", ok:true},
+                {t:"🚗 Assembler des voitures dans une usine", ok:false},
+                {t:"🪓 Couper des arbres dans la forêt", ok:true},
+                {t:"💇 Couper les cheveux d'un client", ok:false},
+                {t:"⛏️ Extraire du charbon dans une mine", ok:true},
+                {t:"👕 Vendre des vêtements", ok:false},
+                {t:"🐄 Élever des vaches", ok:true} ],
+        hint:"Pour chaque ligne, demande-toi : est-ce qu'on sort quelque chose du sol, du sous-sol, de la mer ou de la forêt ? Et les animaux qu'on élève, d'où viennent-ils ?",
+        ok:"Pêche, forêt, mine, élevage : on prend des richesses dans la nature, c'est le secteur primaire. Assembler des voitures, c'est transformer ; couper les cheveux et vendre, c'est rendre un service.",
+        explain:"Les 4 activités du secteur primaire : la pêche, la coupe des arbres, la mine et l'élevage. Assembler des voitures, c'est transformer (secondaire). Coiffer et vendre, c'est rendre un service (tertiaire)." }
+    ]
+  },
+
+  /* ---------------- MISSION 2 ---------------- */
+  { id:'m2', icon:'🗂️', title:"Le grand tri des secteurs", desc:"Ranger les activités et les entreprises",
+    inds:['I2'],
+    brief:{
+      rappel:`<p>Pour ranger une activité, pose-toi <b>trois questions, dans l'ordre</b> :</p>
+        <p>1. Est-ce qu'on <b>prend</b> quelque chose dans la nature (champs, mer, forêt, élevage…) ? → <b>primaire</b><br>
+        2. Sinon, est-ce qu'on <b>transforme</b> ou qu'on <b>construit</b> ? → <b>secondaire</b><br>
+        3. Sinon, on <b>rend un service</b> → <b>tertiaire</b></p>
+        <p>⚠️ Deux pièges à retenir : construire des bâtiments (charpentier, couvreur…) fait partie du <b>secondaire</b>. Et <b>vendre</b>, c'est toujours du tertiaire, même quand on vend des produits de la nature.</p>`,
+      exemple:`🌷 Un <b>fleuriste</b> vend des fleurs. Les fleurs viennent de la nature… mais le fleuriste ne les cultive pas : il les <b>vend</b> et conseille ses clients. Il est donc dans le <b>tertiaire</b>.`,
+      truc:`Si tu hésites, imagine la personne au travail : elle a les mains dans la terre ? Dans une machine ou sur un chantier ? Ou elle s'occupe d'un client ?`,
+      plus:`Proximus s'appelait autrefois <b>Belgacom</b>. L'entreprise a changé de nom en 2014.`
+    },
+    questions:[
+      { type:'zones', ind:'I2', pts:14,
+        prompt:"Range chaque activité dans son secteur.",
+        instr:"Clique sur une étiquette, puis sur la bonne case. Pour enlever une étiquette mal placée, clique dessus.",
+        zones:[ {id:'P', icon:'🌱', label:'Primaire', sub:'Je prends dans la nature'},
+                {id:'S', icon:'🏭', label:'Secondaire', sub:'Je transforme'},
+                {id:'T', icon:'🛒', label:'Tertiaire', sub:'Je rends un service'} ],
+        items:[ {t:"Culture de betteraves", z:'P'}, {t:"Élevage de poulets", z:'P'},
+                {t:"Construction d'avions", z:'S'}, {t:"Pose de carrelage", z:'S'}, {t:"Laiterie : fabrication de beurre", z:'S'},
+                {t:"Vente de fruits et légumes", z:'T'}, {t:"Livraison de colis par bpost", z:'T'} ],
+        hint:"Pour chaque étiquette : on prend dans la nature ? On transforme ou on construit ? Ou on rend un service ? Relis les deux pièges du rappel.",
+        explain:"Poser du carrelage, c'est de la construction : secteur secondaire. La laiterie transforme le lait en beurre : secondaire aussi. Vendre des fruits, c'est du commerce : tertiaire, même si les fruits viennent de la nature. Livrer des colis, c'est un service de transport : tertiaire." },
+
+      { type:'qcm', ind:'I2', pts:6,
+        prompt:"Proximus te vend un abonnement pour ton GSM et pour Internet. Dans quel secteur travaille Proximus ?",
+        options:["Tertiaire, car il rend un service de télécommunication",
+                 "Secondaire, car il transforme des matières premières",
+                 "Primaire, car il extrait des métaux pour fabriquer les GSM",
+                 "Aucun secteur, car on ne peut pas toucher Internet"],
+        correct:0,
+        hint:"Est-ce que Proximus cultive, extrait ou fabrique quelque chose pour toi ? Ou est-ce qu'il te permet de faire quelque chose ?",
+        ok:"Proximus te permet de téléphoner et d'aller sur Internet : c'est un service. Les télécommunications sont dans le secteur tertiaire, comme les banques, bpost ou la SNCB.",
+        explain:"Proximus ne fabrique rien et ne prend rien dans la nature : il te rend un service (téléphone, Internet). C'est le secteur tertiaire. Un service ne se touche pas, mais c'est bien une activité économique." },
+
+      { type:'hunt', ind:'I2', pts:8,
+        prompt:"Tom, stagiaire chez Colruyt, a écrit sa fiche de révision. Il a fait <b>2 erreurs</b>. Trouve les 2 phrases fausses.",
+        instr:"Clique sur une phrase pour la marquer, puis sur « Vérifier ». Attention : marquer une phrase juste te coûte 1 XP.",
+        doc:"📝 Fiche de révision de Tom",
+        sentences:[
+          {t:"Le secteur primaire prend ses richesses dans la nature.", err:false},
+          {t:"Une brasserie qui fabrique de la bière fait partie du secteur primaire.", err:true, fix:"Faux : la brasserie transforme l'orge et le houblon en bière. Secteur secondaire."},
+          {t:"Un pêcheur en mer du Nord travaille dans le secteur primaire.", err:false},
+          {t:"Colruyt, où je fais mon stage, fait partie du secteur tertiaire.", err:false},
+          {t:"Un maçon qui construit une maison travaille dans le secteur tertiaire.", err:true, fix:"Faux : construire une maison, c'est de la construction. Secteur secondaire."},
+          {t:"Une banque comme Belfius rend un service : elle est dans le secteur tertiaire.", err:false}
+        ],
+        hint:"Relis chaque phrase en te demandant : on prend, on transforme ou on rend un service ? Et n'oublie pas le piège de la construction.",
+        explain:"Les deux erreurs de Tom : la brasserie transforme (secondaire), et le maçon construit (secondaire). Les quatre autres phrases étaient justes." },
+
+      { type:'vf', ind:'I2', pts:4,
+        prompt:"Une ferme élève des vaches, fabrique son propre fromage et le vend sur place. Cette entreprise a des activités dans plusieurs secteurs.",
+        answer:true,
+        explain:"Élever les vaches = primaire. Fabriquer le fromage = secondaire. Le vendre à la ferme = tertiaire. Une même entreprise peut donc avoir des activités dans plusieurs secteurs." },
+
+      { type:'write', ind:'I2', pts:6,
+        prompt:"Écris le nom du secteur de cette entreprise (un seul mot suffit).",
+        data:"🪨 <b>Carrières du Hainaut</b>, à Soignies<br>L'entreprise sort de la pierre bleue du sous-sol.",
+        accept:['primaire'], answerText:'primaire', tol:2, placeholder:"Écris ta réponse ici",
+        hint:"La pierre était déjà dans le sol avant l'arrivée des ouvriers. Est-ce que l'entreprise la fabrique, ou est-ce qu'elle la prend dans la nature ?",
+        ok:"On extrait la pierre du sous-sol : on prend dans la nature. C'est le secteur primaire, comme les mines ou l'extraction du pétrole.",
+        explain:"La réponse est <b>primaire</b>. L'entreprise ne fabrique pas la pierre : elle la sort du sous-sol. Extraire, c'est prendre dans la nature." }
+    ]
+  },
+
+  /* ---------------- MISSION 3 ---------------- */
+  { id:'m3', icon:'🤝', title:"Qui est le patron ?", desc:"Entreprise individuelle ou société",
+    inds:['I4','I5','I1'],
+    brief:{
+      rappel:`<p>Derrière chaque entreprise, il y a quelqu'un qui décide. Aux yeux de la loi, il existe deux grandes formes :</p>
+        <p>👤 <b>L'entreprise individuelle</b> appartient à <b>une seule personne</b> : un <b>indépendant</b>. Il garde tous les bénéfices de son travail.</p>
+        <p>👥 <b>La société</b> est créée par une ou plusieurs personnes : les <b>associés</b>. La société a sa propre existence, comme une personne.</p>`,
+      exemple:`🥖 « Boulangerie Dupont » (Marc Dupont, boulanger) → <b>entreprise individuelle</b>.<br>🔧 « Pneus Express SA » → <b>société</b>.`,
+      truc:`Regarde juste après le nom : s'il y a <b>SA</b>, <b>SRL</b> ou <b>SC</b>, c'est une société. S'il n'y a aucun sigle et aucune information, considère que c'est une entreprise individuelle.`,
+      plus:`Une coopérative réunit souvent des personnes qui veulent travailler ensemble : par exemple des agriculteurs qui vendent leurs légumes en commun.`
+    },
+    questions:[
+      { type:'qcm', ind:'I4', pts:6,
+        prompt:"Que risque Kevin ?",
+        data:"🔧 <b>Kevin</b> est plombier indépendant : il a une <b>entreprise individuelle</b>.<br>Son entreprise a <b>20 000 €</b> de dettes qu'elle ne peut pas payer.",
+        options:["Il doit payer avec ses biens personnels : ses économies, sa voiture…",
+                 "Rien : l'État paie les dettes à sa place",
+                 "Ses clients doivent payer les dettes à sa place",
+                 "Les dettes disparaissent quand l'entreprise ferme"],
+        correct:0,
+        hint:"Kevin est seul : il n'y a aucune société entre lui et ses dettes. Qui va devoir payer, et avec quel argent ?",
+        ok:"Dans une entreprise individuelle, l'indépendant garde tous les bénéfices… mais supporte aussi toutes les pertes. Il paie les dettes avec ses biens personnels : économies, voiture, parfois même sa maison.",
+        explain:"L'indépendant supporte toutes les pertes. Les dettes de son entreprise sont ses dettes : il doit les payer avec ses biens personnels (économies, voiture, maison). C'est le gros risque de l'entreprise individuelle." },
+
+      { type:'zones', ind:'I4', pts:12,
+        prompt:"Entreprise individuelle ou société ? Range chaque entreprise.",
+        instr:"Clique sur une étiquette, puis sur la bonne case. Pour enlever une étiquette mal placée, clique dessus.",
+        zones:[ {id:'I', icon:'👤', label:'Entreprise individuelle', sub:'Une seule personne'},
+                {id:'S', icon:'👥', label:'Société', sub:'Des associés'} ],
+        items:[ {t:"Fleurs de Nadia (Nadia Leroy, fleuriste)", z:'I'}, {t:"Brico-Plus SRL", z:'S'},
+                {t:"Les Vergers du Borinage SC", z:'S'}, {t:"Garage Martin (Luc Martin, garagiste)", z:'I'},
+                {t:"Mode Urbaine SA", z:'S'}, {t:"Friterie Chez Momo (aucune autre information)", z:'I'} ],
+        hint:"Regarde bien la fin de chaque nom : y a-t-il SA, SRL ou SC ? Et quand on ne te dit rien, que conseille l'astuce ?",
+        explain:"SA, SRL ou SC après le nom → société. Une seule personne citée, sans sigle → entreprise individuelle. Aucune information → on considère que c'est une entreprise individuelle (comme la friterie)." },
+
+      { type:'vf', ind:'I5', pts:4,
+        prompt:"Depuis 2019, on ne crée plus de SPRL en Belgique : elle a été remplacée par la SRL.",
+        answer:true,
+        explain:"Depuis la réforme de 2019, la SPRL s'appelle <b>SRL</b>. Si tu vois encore « SPRL » sur un vieux document, c'est l'ancien nom." },
+
+      { type:'write', ind:'I5', pts:6,
+        prompt:"Complète : SRL veut dire « Société à responsabilité … ». Écris le mot qui manque.",
+        data:"🏢 <b>Brico-Plus SRL</b><br>S = Société · R = Responsabilité · L = ?",
+        accept:['limitee','limite'], answerText:'limitée', tol:1, placeholder:"Le mot qui manque",
+        hint:"Dans une SRL, les biens personnels des associés sont en principe protégés : leur responsabilité ne va pas plus loin qu'un certain point. Quel mot commence par L et veut dire « qui a une limite » ?",
+        ok:"SRL = Société à Responsabilité Limitée. « Limitée » veut dire que si la société a des dettes, les biens personnels des associés sont en principe protégés.",
+        explain:"La réponse est <b>limitée</b> : SRL = Société à Responsabilité Limitée. Les associés ne risquent pas leur maison ou leur voiture si la société a des dettes." },
+
+      { type:'gaps', ind:'I1', pts:12,
+        prompt:"Complète le résumé du chapitre : c'est ta fiche de révision !",
+        instr:"Clique sur un mot : il va dans le trou surligné. Tu peux choisir un autre trou en cliquant dessus. Attention, 3 mots sont en trop.",
+        text:"Le pêcheur et l'agriculteur travaillent dans le secteur [[primaire]] : ils prennent les richesses de la nature. Le secteur [[secondaire]] transforme les matières premières ; la [[construction]] des bâtiments en fait aussi partie. Le vendeur travaille dans le secteur [[tertiaire]] : il rend un service. Nadia dirige seule sa boutique, sans associé : c'est une entreprise [[individuelle]]. Trois amis créent ensemble « Vélo-Pro SRL » : c'est une [[société]].",
+        intrus:["agriculture","banque","coopérative"],
+        hint:"Commence par les trous dont tu es sûr(e). Pour les secteurs, pense à « prendre, transformer, rendre un service ». Pour les deux dernières phrases, compte le nombre de personnes et regarde le sigle.",
+        explain:"C'est le résumé de tout le chapitre : prendre dans la nature (primaire), transformer et construire (secondaire), rendre un service (tertiaire). Une seule personne = entreprise individuelle ; des associés et un sigle = société." }
+    ]
+  }
+];
+
+/* ---- Totaux calculés (CONVENTIONS §1.4) ---- */
+LEVELS.forEach(lv => { lv.maxPoints = lv.questions.reduce((s,q) => s + q.pts, 0); });
+const TOTAL_XP = LEVELS.reduce((s,lv) => s + lv.maxPoints, 0);
+const TOTAL_Q  = LEVELS.reduce((s,lv) => s + lv.questions.length, 0);
+
+/* ---- Rotation déterministe des propositions (CONVENTIONS §3.7) ---- */
+const DECALAGE = [2,0,3,1, 1,3,0,2, 3,1,2,0, 0,2,1,3, 2,3,0,1];
+(function melangerPropositions(liste){
+  let k = 0;
+  liste.forEach(q => {
+    if(!q.options) return;
+    const t = DECALAGE[k++ % DECALAGE.length];
+    for(let n = 0; n < t; n++){
+      q.options.unshift(q.options.pop());
+      q.correct = (q.correct + 1) % q.options.length;
+    }
+  });
+})(LEVELS.flatMap(lv => lv.questions));
+
+/* ---- Durées estimées (CONVENTIONS §3.9 et §3.14), en secondes ---- */
+const DUREE = { qcm:40, vf:20, multi:60, write:90, zones:90, match:60, order:60, gaps:90, hunt:120 };
+const DUREE_BRIEF = 60;
+const DUREE_TOTALE = LEVELS.reduce((s,lv) => s + DUREE_BRIEF + lv.questions.reduce((t,q) => t + DUREE[q.type], 0), 0);
+
+const TYPE_LABEL = { qcm:'QCM', vf:'Vrai ou faux', multi:'Plusieurs réponses', write:'Réponse à écrire',
+  zones:'Classement', match:'Appariement', order:'Remise en ordre', gaps:'Texte à trous', hunt:'Chasse aux erreurs' };
+const ELEMENT_TYPES = ['zones','match','order','gaps'];
+
+/* ---- Rangs thématiques (vente), en % du total ---- */
+const RANKS = [
+  { th:0,    icon:'🎒', name:'Stagiaire' },
+  { th:0.20, icon:'📦', name:'Réassortisseur' },
+  { th:0.45, icon:'🛒', name:'Vendeur' },
+  { th:0.65, icon:'🏅', name:'Chef de rayon' },
+  { th:0.85, icon:'👑', name:'Gérant du magasin' }
+];
+
+/* ---- Badges (CONVENTIONS §4.8) ---- */
+const BADGES = [
+  { id:'first',   icon:'🚀', name:'Premier rayon',     cond:"Terminer la mission 1",                    test:() => APP.completed.has(0) },
+  { id:'all',     icon:'🏁', name:'Parcours complet',  cond:"Terminer les 3 missions",                  test:() => APP.completed.size === LEVELS.length },
+  { id:'perfect', icon:'💯', name:'Sans faute',        cond:"Réussir toute une mission du premier coup", test:() => LEVELS.some((lv,l) => APP.completed.has(l) && levelStats(l).c === lv.questions.length) },
+  { id:'streak',  icon:'🔥', name:'En feu',            cond:"5 bonnes réponses du premier coup d'affilée", test:() => APP.bestStreak >= 5 },
+  { id:'frite',   icon:'🍟', name:'Roi de la frite',   cond:"Remettre le voyage de la frite en ordre du premier coup", test:() => stStatus(0,0) === 'correct' },
+  { id:'lynx',    icon:'🕵️', name:'Œil de lynx',       cond:"Trouver les 2 erreurs de Tom du premier coup, sans fausse alerte", test:() => { const s = APP.qs['1_2']; return !!(s && s.done && s.status === 'correct' && s.alarms === 0); } },
+  { id:'predict', icon:'🎯', name:'Je me connais',     cond:"Prédire correctement son résultat sur une mission", test:() => LEVELS.some((lv,l) => APP.completed.has(l) && predictionMatch(l) === 0) },
+  { id:'pro',     icon:'⭐', name:'Pro de la vente',   cond:"Gagner au moins 85 % des XP du parcours",  test:() => APP.completed.size === LEVELS.length && APP.score >= 0.85 * TOTAL_XP }
+];
+
+const PREDICTIONS = [
+  { id:'half', label:'Environ la moitié 😅', short:'environ la moitié' },
+  { id:'3q',   label:'Les trois quarts 💪',  short:'les trois quarts' },
+  { id:'all',  label:'Toutes ! 🏆',          short:'toutes' }
+];
+
+/* ============================================================
+   3. ÉTAT DE L'APPLICATION (machine à états unique)
+   ============================================================ */
+const APP = {
+  screen:'welcome', level:0, q:0, qs:{}, score:0, streak:0, bestStreak:0,
+  completed:new Set(), predictions:{}, badges:new Set(), sound:false, rank:0,
+  fx:null, finalCelebrated:false, timerLevel:null, sentLevels:new Set(),
+  /* tracking */
+  email: localStorage.getItem('student_email') || '',
+  classe: localStorage.getItem('student_classe') || '',
+  exerciseStartTime:null, exerciseTimes:{}, exerciseScores:{}, scoreBeforeExercise:0,
+  globalTimerStart:null, globalTimerInterval:null
+};
+
+const key = (l,q) => l + '_' + q;
+function getQ(l,q){ const raw = LEVELS[l].questions[q]; if(raw.variants) return Object.assign({}, raw, raw.variants[APP.scenario]); return raw; }
+
+function shuffled(n, seed){
+  const a = [...Array(n).keys()]; let s = seed;
+  for(let i = n-1; i > 0; i--){ s = (s*9301 + 49297) % 233280; const j = Math.floor(s/233280*(i+1)); [a[i],a[j]] = [a[j],a[i]]; }
+  return a;
+}
+
+function parseGaps(Q){
+  if(Q._parts) return;
+  const parts = Q.text.split(/\[\[(.+?)\]\]/);
+  Q._parts = parts; Q._answers = parts.filter((_,i) => i % 2 === 1);
+  Q._bank = Q._answers.concat(Q.intrus);
+}
+
+function getSt(l,q){
+  const k = key(l,q);
+  if(APP.qs[k]) return APP.qs[k];
+  const Q = getQ(l,q);
+  const seed = l*31 + q*7 + 11;
+  const st = { attempts:0, done:false, status:null, earned:0, fb:'', fbType:'', bounce:[] };
+  switch(Q.type){
+    case 'qcm': st.wrong = []; st.chosen = null; break;
+    case 'vf': st.chosen = null; break;
+    case 'multi': st.sel = Q.items.map(() => false); break;
+    case 'write': st.val = ''; break;
+    case 'zones': st.place = Q.items.map(() => null); st.lock = Q.items.map(() => null); st.selected = null; st.order = shuffled(Q.items.length, seed); break;
+    case 'match': st.choice = Q.terms.map(() => ''); st.lock = Q.terms.map(() => null); st.defOrder = shuffled(Q.defs.length, seed); break;
+    case 'order': { const n = Q.steps.length + Q.distractors.length; st.labels = Q.steps.concat(Q.distractors); st.labelOrder = shuffled(n, seed); st.slots = Q.steps.map(() => null); st.lock = Q.steps.map(() => null); break; }
+    case 'gaps': parseGaps(Q); st.fill = Q._answers.map(() => null); st.lock = Q._answers.map(() => null); st.active = 0; st.bankOrder = shuffled(Q._bank.length, seed); break;
+    case 'hunt': st.flag = Q.sentences.map(() => false); st.lock = Q.sentences.map(() => null); st.alarms = 0; st.alarmFlash = []; break;
+  }
+  APP.qs[k] = st;
+  return st;
+}
+function stStatus(l,q){ const s = APP.qs[key(l,q)]; return s && s.done ? s.status : null; }
+
+/* ============================================================
+   4. RENDU
+   ============================================================ */
+function setScreen(name){ APP.screen = name; renderScreen(); renderNav(); window.scrollTo({top:0, behavior:'smooth'}); }
+
+function renderScreen(){
+  const m = document.getElementById('main');
+  switch(APP.screen){
+    case 'welcome':  m.innerHTML = renderWelcome(); break;
+    case 'hub':      m.innerHTML = renderHub(); break;
+    case 'brief':    m.innerHTML = renderBrief(APP.level); break;
+    case 'question': m.innerHTML = renderQuestion(APP.level, APP.q); break;
+    case 'bilan':    m.innerHTML = renderBilan(APP.level); break;
+  }
+  updateHUD();
+  postRender();
+}
+
+function postRender(){
+  if(APP.fx === 'shake'){ const c = document.getElementById('qcard'); if(c){ c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake'); } }
+  APP.fx = null;
+  Object.values(APP.qs).forEach(s => { s.bounce = []; if(s.alarmFlash) s.alarmFlash = []; });
+}
+
+function isUnlocked(l){ return l === 0 || APP.completed.has(l-1); }
+
+function renderNav(){
+  const nav = document.getElementById('nav');
+  nav.innerHTML = LEVELS.map((lv,l) => {
+    const locked = !isUnlocked(l), done = APP.completed.has(l);
+    const cur = (APP.screen === 'brief' || APP.screen === 'question' || APP.screen === 'bilan') && APP.level === l;
+    const cls = 'navpill' + (locked ? ' locked' : '') + (done ? ' done' : '') + (cur ? ' cur' : '');
+    const label = done ? '✓ ' + (l+1) : locked ? '🔒' : (l+1);
+    return `<button class="${cls}" ${locked ? 'disabled aria-disabled="true"' : ''} onclick="openLevel(${l})" title="Mission ${l+1} — ${lv.title.replace(/"/g,'&quot;')}">${label}</button>`;
+  }).join('');
+}
+
+function rankIndex(score){ let r = 0; RANKS.forEach((rk,i) => { if(score >= Math.ceil(rk.th * TOTAL_XP)) r = i; }); return r; }
+
+function updateHUD(){
+  const r = rankIndex(APP.score);
+  document.getElementById('hudXP').textContent = APP.score + ' XP';
+  const sk = document.getElementById('hudStreak');
+  sk.textContent = '🔥 ' + APP.streak; sk.classList.toggle('hot', APP.streak >= 3);
+  document.getElementById('hudRank').textContent = RANKS[r].icon + ' ' + RANKS[r].name;
+  const next = RANKS[r+1];
+  document.getElementById('hudNext').textContent = next ? `Prochain rang : ${next.icon} ${next.name} à ${Math.ceil(next.th*TOTAL_XP)} XP` : 'Rang maximum atteint !';
+  document.getElementById('xpfill').style.width = Math.min(100, APP.score / TOTAL_XP * 100) + '%';
+  const bar = document.getElementById('xpbar');
+  bar.querySelectorAll('.xpmark').forEach(e => e.remove());
+  RANKS.slice(1).forEach(rk => {
+    const d = document.createElement('div');
+    d.className = 'xpmark' + (APP.score >= Math.ceil(rk.th*TOTAL_XP) ? ' reached' : '');
+    d.style.left = (rk.th*100) + '%'; d.title = rk.icon + ' ' + rk.name;
+    bar.appendChild(d);
+  });
+}
+
+function playerName(){
+  if(!APP.email) return '';
+  return APP.email.split('@')[0].split(/[._-]/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+}
+
+/* ---------- Accueil ---------- */
+function renderWelcome(){
+  const mins = Math.round(DUREE_TOTALE / 60);
+  return `<section class="welcome">
+    <div class="chain" aria-hidden="true">
+      <div class="step"><span class="e">🌱</span><span>Nature</span></div><span class="arrow">➜</span>
+      <div class="step"><span class="e">🏭</span><span>Usine</span></div><span class="arrow">➜</span>
+      <div class="step"><span class="e">🛒</span><span>Magasin</span></div>
+    </div>
+    <h1>L'entreprise<br>Partie 2</h1>
+    <p class="sub">Les trois secteurs d'activité, puis qui dirige l'entreprise. Pars de Stagiaire et deviens Gérant du magasin !</p>
+    <div class="stats">
+      <span class="stat">🗺️ <b>${LEVELS.length}</b> missions</span>
+      <span class="stat">❓ <b>${TOTAL_Q}</b> questions</span>
+      <span class="stat">⚡ <b>${TOTAL_XP}</b> XP</span>
+      <span class="stat">🏆 <b>${BADGES.length}</b> badges</span>
+      <span class="stat">⏱️ environ <b>${mins}</b> min</span>
+    </div>
+    ${APP.email ? `<p class="player">Connecté : <b>${playerName()}</b>${APP.classe ? ' · ' + APP.classe : ''}</p>` : ''}
+    <div class="btn-row"><button class="btn" onclick="goHub()">Commencer ➜</button></div>
+    <div class="btn-row">
+      <button class="lb-btn app" onclick="openLB('app')">🏆 Classement</button>
+      <button class="lb-btn glob" onclick="openLB('global')">🌍 Général</button>
+    </div>
+    <div class="howto">
+      <b>Comment ça marche ?</b>
+      <ul>
+        <li>Tu as <b>2 essais</b> par question (1 seul pour les vrai ou faux).</li>
+        <li>Si tu te trompes, un <b>indice</b> t'aide. Une erreur ne te fait pas perdre de points (sauf une fausse alerte dans la chasse aux erreurs).</li>
+        <li>Bonne réponse au 2e essai = <b>la moitié des XP</b>.</li>
+      </ul>
+    </div>
+  </section>`;
+}
+
+/* ---------- Parcours ---------- */
+function levelStats(l){
+  const lv = LEVELS[l]; let c = 0, h = 0, s = 0, xp = 0;
+  lv.questions.forEach((_,i) => { const st = APP.qs[key(l,i)]; if(st && st.done){ xp += st.earned; if(st.status === 'correct') c++; else if(st.status === 'hint') h++; else s++; } });
+  return { c, h, s, xp, n:lv.questions.length, max:lv.maxPoints };
+}
+function starsHTML(ratio){
+  const n = ratio >= .85 ? 3 : ratio >= .65 ? 2 : ratio >= .45 ? 1 : 0;
+  return `<span class="stars" aria-label="${n} étoile(s) sur 3">${'★'.repeat(n)}<span class="off">${'★'.repeat(3-n)}</span></span>`;
+}
+
+function renderHub(){
+  const allDone = APP.completed.size === LEVELS.length;
+  let html = '';
+  if(allDone) html += renderFinal();
+  html += `<h2 class="section-title">🗺️ Ton parcours dans le magasin</h2><div class="path">`;
+  LEVELS.forEach((lv,l) => {
+    const done = APP.completed.has(l), locked = !isUnlocked(l);
+    const state = done ? 'done' : locked ? 'locked' : 'todo';
+    const stt = levelStats(l);
+    const meta = done ? `${starsHTML(stt.xp/stt.max)} &nbsp; ${stt.xp} / ${stt.max} XP`
+                      : `${lv.questions.length} questions · ${lv.maxPoints} XP à gagner`;
+    html += `<div class="prow ${l % 2 ? 'right' : 'left'}">
+      <span class="node ${state}" aria-hidden="true">${done ? '✓' : locked ? '🔒' : l+1}</span>
+      <button class="aisle ${state}" ${locked ? 'disabled aria-disabled="true"' : ''} onclick="openLevel(${l})">
+        <span class="aisle-sign">Rayon ${l+1}</span>
+        <h3><span aria-hidden="true">${lv.icon}</span> ${lv.title}</h3>
+        <p>${lv.desc}</p>
+        <span class="meta">${meta}</span>
+      </button></div>`;
+  });
+  html += `</div><h2 class="section-title">🏆 Vitrine des trophées (${APP.badges.size}/${BADGES.length})</h2><div class="trophies">`;
+  BADGES.forEach(b => {
+    const on = APP.badges.has(b.id);
+    html += `<div class="trophy ${on ? 'on' : 'off'}"><span class="ti" aria-hidden="true">${b.icon}</span><b>${b.name}</b><small>${b.cond}</small></div>`;
+  });
+  html += `</div>`;
+  return html;
+}
+
+/* ---------- Briefing ---------- */
+function renderBrief(l){
+  const lv = LEVELS[l], B = lv.brief;
+  const inds = lv.inds.map(id => findInd(id));
+  const pred = APP.predictions[l];
+  return `<section class="panel">
+    <div class="brief-head"><span class="big" aria-hidden="true">${lv.icon}</span>
+      <div><div class="meta">Rayon ${l+1} · ${lv.questions.length} questions · ${lv.maxPoints} XP en jeu</div><h2>${lv.title}</h2></div></div>
+    <div class="goals"><h4>🎯 À la fin de cette mission, tu sauras…</h4><ul>${inds.map(i => `<li>${i.but}</li>`).join('')}</ul></div>
+    <div class="rappel">${B.rappel}</div>
+    <div class="box ex"><h4>📌 Exemple</h4>${B.exemple}</div>
+    <div class="box truc"><h4>💡 Le truc</h4>${B.truc}</div>
+    ${B.plus ? `<div class="box plus"><h4>✨ Pour aller plus loin</h4>${B.plus}</div>` : ''}
+    <div class="predict"><p>Combien de questions penses-tu réussir du premier coup ?</p>
+      <div class="pred-btns">${PREDICTIONS.map(p => `<button class="pred ${pred === p.id ? 'sel' : ''}" onclick="setPrediction('${p.id}')" aria-pressed="${pred === p.id}">${p.label}</button>`).join('')}</div></div>
+    <div class="btn-row">
+      <button class="btn ghost" onclick="goHub()">← Parcours</button>
+      <button class="btn" onclick="startLevel()" ${pred ? '' : 'disabled'} title="${pred ? '' : 'Choisis d’abord ta prédiction'}">C'est parti ➜</button>
+    </div>
+  </section>`;
+}
+
+/* ---------- Question ---------- */
+function renderQuestion(l,q){
+  const lv = LEVELS[l], Q = getQ(l,q), st = getSt(l,q);
+  const pills = lv.questions.map((_,i) => {
+    const s = APP.qs[key(l,i)];
+    const c = s && s.done ? s.status : (i === q ? 'cur' : '');
+    return `<span class="qpill ${c}"></span>`;
+  }).join('');
+  const essais = Q.type === 'vf' ? '1 essai' : '2 essais';
+  let body = '';
+  switch(Q.type){
+    case 'qcm': body = rQCM(Q,st); break;
+    case 'vf': body = rVF(Q,st); break;
+    case 'multi': body = rMulti(Q,st); break;
+    case 'write': body = rWrite(Q,st); break;
+    case 'zones': body = rZones(Q,st); break;
+    case 'match': body = rMatch(Q,st); break;
+    case 'order': body = rOrder(Q,st); break;
+    case 'gaps': body = rGaps(Q,st); break;
+    case 'hunt': body = rHunt(Q,st); break;
+  }
+  const fb = st.fb ? `<div class="fb fb-${st.fbType}" role="status">${st.fb}</div>` : '';
+  let actions = '';
+  if(st.done){
+    const last = q === lv.questions.length - 1;
+    actions = `<button class="btn" id="nextBtn" onclick="nextQuestion()">${last ? 'Voir mon bilan 🏁' : 'Question suivante ➜'}</button>`;
+  } else if(Q.type !== 'qcm' && Q.type !== 'vf'){
+    actions = `<button class="btn" id="verifyBtn" onclick="verify()" ${canVerify(Q,st) ? '' : 'disabled'}>Vérifier ✔</button>`;
+  }
+  return `<div class="qhead"><span class="where">Rayon ${l+1} · ${lv.title} · Question ${q+1}/${lv.questions.length}</span><span class="qpills" aria-hidden="true">${pills}</span></div>
+    <article class="qcard" id="qcard">
+      <span class="tag">${TYPE_LABEL[Q.type]} — ${essais} · ${Q.pts} XP</span>
+      ${Q.data ? `<span class="data">${Q.data}</span>` : ''}
+      <p class="prompt">${Q.prompt}</p>
+      ${Q.instr ? `<p class="instr">${Q.instr}</p>` : ''}
+      ${body}
+      ${fb}
+      <div class="qactions">${actions}</div>
+    </article>`;
+}
+
+function rQCM(Q,st){
+  return `<div class="opts">${Q.options.map((o,i) => {
+    let c = '';
+    if(st.wrong.includes(i)) c = 'bad';
+    if(st.done && i === Q.correct) c = 'good';
+    const dis = st.done || st.wrong.includes(i);
+    return `<button class="opt ${c}" ${dis ? 'disabled' : ''} onclick="answerQCM(${i})">${o}</button>`;
+  }).join('')}</div>`;
+}
+function rVF(Q,st){
+  const b = (val,label) => {
+    let c = '';
+    if(st.done){ if(val === Q.answer) c = 'good'; else if(st.chosen === val) c = 'bad'; }
+    return `<button class="opt ${c}" ${st.done ? 'disabled' : ''} onclick="answerVF(${val})">${label}</button>`;
+  };
+  return `<div class="vf-row">${b(true,'✔️ Vrai')}${b(false,'✖️ Faux')}</div>`;
+}
+function rMulti(Q,st){
+  return `<div class="opts">${Q.items.map((it,i) => {
+    let c = st.sel[i] ? 'sel' : '';
+    if(st.done && st.status !== 'correct' && st.status !== 'hint'){
+      if(it.ok && st.sel[i]) c = 'good'; else if(!it.ok && st.sel[i]) c = 'bad'; else if(it.ok) c = 'missed';
+    } else if(st.done){ if(it.ok) c = 'good'; }
+    return `<button class="opt ${c}" ${st.done ? 'disabled' : ''} aria-pressed="${st.sel[i]}" onclick="toggleMulti(${i})">${st.sel[i] ? '☑' : '☐'} ${it.t}</button>`;
+  }).join('')}</div>`;
+}
+function rWrite(Q,st){
+  const c = st.done ? (st.status === 'shown' ? 'bad' : 'good') : '';
+  return `<input class="winput ${c}" id="winput" type="text" autocomplete="off" spellcheck="false" placeholder="${Q.placeholder || ''}"
+    value="${escAttr(st.val)}" ${st.done ? 'disabled' : ''} oninput="setWrite(this.value)" onkeydown="if(event.key==='Enter')verify()">`;
+}
+function rZones(Q,st){
+  const reserve = st.order.filter(i => st.place[i] === null).map(i =>
+    `<button class="chipel ${st.selected === i ? 'sel' : ''} ${st.bounce.includes(i) ? 'bounce' : ''}" ${st.done ? 'disabled' : ''} onclick="zoneSelect(${i})">${Q.items[i].t}</button>`).join('');
+  const zones = Q.zones.map(z => {
+    const items = st.order.filter(i => st.place[i] === z.id).map(i => {
+      const lk = st.lock[i];
+      const fix = lk === 'ko' ? `<span class="fix">→ ${Q.zones.find(zz => zz.id === Q.items[i].z).label}</span>` : '';
+      return `<button class="chipel ${lk || ''}" ${lk || st.done ? 'disabled' : ''} onclick="event.stopPropagation();zoneUnplace(${i})">${Q.items[i].t}${fix}</button>`;
+    }).join('');
+    const target = st.selected !== null && !st.done;
+    return `<div class="zone ${target ? 'target' : ''}" role="button" tabindex="${target ? 0 : -1}" onclick="zonePlace('${z.id}')" onkeydown="if(event.key==='Enter')zonePlace('${z.id}')">
+      <div class="zone-h">${z.icon} ${z.label}<small>${z.sub}</small></div>${items}</div>`;
+  }).join('');
+  return `<div class="reserve">${reserve}</div><div class="zones z${Q.zones.length}">${zones}</div>`;
+}
+function rMatch(Q,st){
+  return Q.terms.map((t,i) => {
+    const lk = st.lock[i];
+    const opts = `<option value="">— Choisis une définition —</option>` + st.defOrder.map(d => `<option value="${d}" ${String(st.choice[i]) === String(d) ? 'selected' : ''}>${Q.defs[d]}</option>`).join('');
+    const fix = lk === 'ko' ? `<div class="match-fix">✏️ ${Q.defs[t.d]}</div>` : '';
+    return `<div class="match-row ${st.bounce.includes(i) ? 'bounce' : ''}"><span class="term">${t.t}</span>
+      <select class="${lk || ''}" aria-label="Définition de ${t.t}" ${lk || st.done ? 'disabled' : ''} onchange="setMatch(${i}, this.value)">${opts}</select>${fix}</div>`;
+  }).join('');
+}
+function rOrder(Q,st){
+  const slots = st.slots.map((lab,i) => {
+    const lk = st.lock[i];
+    const fix = lk === 'ko' ? `<span class="fix">✏️ ${Q.steps[i]}</span>` : '';
+    const content = lab === null ? `<span class="empty">Clique sur une étiquette…</span>` : `<span>${st.labels[lab]}${fix}</span>`;
+    return `<button class="slot ${lab !== null ? 'filled' : ''} ${lk || ''}" ${lk || st.done || lab === null ? 'disabled' : ''} onclick="orderUnplace(${i})"><span class="n">${i+1}</span>${content}</button>`;
+  }).join('');
+  const used = new Set(st.slots.filter(x => x !== null));
+  const reserve = st.labelOrder.filter(i => !used.has(i)).map(i =>
+    `<button class="chipel ${st.bounce.includes(i) ? 'bounce' : ''}" ${st.done ? 'disabled' : ''} onclick="orderPlace(${i})">${st.labels[i]}</button>`).join('');
+  return `<div class="slots">${slots}</div><div class="reserve">${reserve}</div>`;
+}
+function rGaps(Q,st){
+  parseGaps(Q);
+  let html = '';
+  Q._parts.forEach((p,i) => {
+    if(i % 2 === 0){ html += p; return; }
+    const g = (i-1)/2, lk = st.lock[g], w = st.fill[g];
+    const fix = lk === 'ko' ? `<span class="fix">✏️ ${Q._answers[g]}</span>` : '';
+    const act = !st.done && !lk && st.active === g ? 'active' : '';
+    html += `<button class="gap ${lk || ''} ${act} ${st.bounce.includes(g) ? 'bounce' : ''}" ${lk || st.done ? 'disabled' : ''} onclick="gapClick(${g})" aria-label="Trou ${g+1}">${w !== null ? Q._bank[w] : '&nbsp;…&nbsp;'}</button>${fix}`;
+  });
+  const used = new Set(st.fill.filter(x => x !== null));
+  const bank = st.bankOrder.filter(i => !used.has(i)).map(i =>
+    `<button class="chipel" ${st.done ? 'disabled' : ''} onclick="gapWord(${i})">${Q._bank[i]}</button>`).join('');
+  return `<div class="gaptext">${html}</div><div class="reserve">${bank}</div>`;
+}
+function rHunt(Q,st){
+  const nErr = Q.sentences.filter(s => s.err).length;
+  const found = Q.sentences.filter((s,i) => s.err && (st.lock[i] === 'ok1' || st.lock[i] === 'ok2')).length;
+  const sents = Q.sentences.map((s,i) => {
+    const lk = st.lock[i];
+    let c = lk || (st.flag[i] ? 'flag' : '');
+    if(st.alarmFlash.includes(i)) c += ' alarm';
+    const fix = (lk === 'ko' || (st.done && s.err)) ? `<span class="fix">✏️ ${s.fix}</span>` : '';
+    return `<button class="hsent ${c}" ${lk || st.done ? 'disabled' : ''} aria-pressed="${st.flag[i]}" onclick="huntToggle(${i})">${st.flag[i] || lk ? '🚩 ' : ''}${s.t}${fix}</button>`;
+  }).join('');
+  return `<p class="hcount">Erreurs trouvées : <b>${found} / ${nErr}</b>${st.alarms ? ` · fausses alertes : ${st.alarms}` : ''}</p>
+    <div class="hunt-doc"><h4>${Q.doc}</h4>${sents}</div>`;
+}
+
+function escAttr(s){ return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+function canVerify(Q,st){
+  switch(Q.type){
+    case 'multi': return st.sel.some(Boolean);
+    case 'write': return st.val.trim().length > 0;
+    case 'zones': return st.place.every(p => p !== null);
+    case 'match': return st.choice.every(c => c !== '');
+    case 'order': return st.slots.every(s => s !== null);
+    case 'gaps': return st.fill.every(f => f !== null);
+    case 'hunt': return st.flag.some((f,i) => f && !st.lock[i]);
+  }
+  return false;
+}
+
+/* ============================================================
+   5. INTERACTIONS
+   ============================================================ */
+function cur(){ return { l:APP.level, q:APP.q, Q:getQ(APP.level, APP.q), st:getSt(APP.level, APP.q) }; }
+function rerender(){ renderScreen(); }
+
+function answerQCM(i){
+  const { l, q, Q, st } = cur();
+  if(st.done || st.wrong.includes(i)) return;
+  st.chosen = i;
+  if(i === Q.correct){
+    const first = st.attempts === 0;
+    resolve(l, q, first ? Q.pts : Q.pts/2, first ? 'correct' : 'hint',
+      `<b class="t">${first ? '✅ Exact !' : '🔄 Bien corrigé !'}</b>${Q.ok}`, 'ok');
+  } else {
+    st.attempts++; st.wrong.push(i);
+    if(st.attempts === 1){ firstMiss(st, `<b class="t">🤔 Pas encore…</b>💡 ${Q.hint}`); }
+    else resolve(l, q, 0, 'shown', `<b class="t">👁 La bonne réponse : ${Q.options[Q.correct]}</b>${Q.explain}`, 'ko');
+  }
+  rerender();
+}
+
+function answerVF(val){
+  const { l, q, Q, st } = cur();
+  if(st.done) return;
+  st.chosen = val; st.attempts = 1;
+  if(val === Q.answer) resolve(l, q, Q.pts, 'correct', `<b class="t">✅ Exact, c'est ${Q.answer ? 'vrai' : 'faux'} !</b>${Q.explain}`, 'ok');
+  else { APP.fx = 'shake'; resolve(l, q, 0, 'shown', `<b class="t">👁 C'était ${Q.answer ? 'vrai' : 'faux'}.</b>${Q.explain}`, 'ko'); }
+  rerender();
+}
+
+function toggleMulti(i){ const { st } = cur(); if(st.done) return; st.sel[i] = !st.sel[i]; rerender(); }
+function setWrite(v){
+  const { st } = cur(); st.val = v;
+  const b = document.getElementById('verifyBtn'); if(b) b.disabled = v.trim().length === 0;
+}
+
+function normTxt(s){
+  return String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z ]/g,' ').replace(/\b(le|la|les|du|de|secteur|l)\b/g,' ').replace(/\s+/g,' ').trim();
+}
+function lev(a,b){
+  const m = a.length, n = b.length, d = Array.from({length:m+1}, (_,i) => [i].concat(Array(n).fill(0)));
+  for(let j = 1; j <= n; j++) d[0][j] = j;
+  for(let i = 1; i <= m; i++) for(let j = 1; j <= n; j++) d[i][j] = Math.min(d[i-1][j]+1, d[i][j-1]+1, d[i-1][j-1] + (a[i-1] === b[j-1] ? 0 : 1));
+  return d[m][n];
+}
+function writeOk(Q,val){
+  const v = normTxt(val);
+  if(!v) return false;
+  return Q.accept.some(a => { const t = normTxt(a); return v === t || lev(v,t) <= (Q.tol || 0); });
+}
+
+/* Zones */
+function zoneSelect(i){ const { st } = cur(); if(st.done) return; st.selected = st.selected === i ? null : i; rerender(); }
+function zonePlace(zid){ const { st } = cur(); if(st.done || st.selected === null) return; st.place[st.selected] = zid; st.selected = null; rerender(); }
+function zoneUnplace(i){ const { st } = cur(); if(st.done || st.lock[i]) return; st.place[i] = null; rerender(); }
+/* Appariement */
+function setMatch(i,v){ const { st } = cur(); if(st.done || st.lock[i]) return; st.choice[i] = v === '' ? '' : Number(v); rerender(); }
+/* Remise en ordre */
+function orderPlace(lab){ const { st } = cur(); if(st.done) return; const k = st.slots.findIndex((s,i) => s === null && !st.lock[i]); if(k < 0) return; st.slots[k] = lab; rerender(); }
+function orderUnplace(i){ const { st } = cur(); if(st.done || st.lock[i]) return; st.slots[i] = null; rerender(); }
+/* Texte à trous */
+function nextEmptyGap(st){ return st.fill.findIndex((f,i) => f === null && !st.lock[i]); }
+function gapClick(g){ const { st } = cur(); if(st.done || st.lock[g]) return; if(st.fill[g] !== null) st.fill[g] = null; st.active = g; rerender(); }
+function gapWord(w){
+  const { st } = cur(); if(st.done) return;
+  let g = st.active;
+  if(g === null || g < 0 || st.fill[g] !== null || st.lock[g]) g = nextEmptyGap(st);
+  if(g < 0) return;
+  st.fill[g] = w;
+  st.active = nextEmptyGap(st);
+  rerender();
+}
+/* Chasse aux erreurs */
+function huntToggle(i){ const { st } = cur(); if(st.done || st.lock[i]) return; st.flag[i] = !st.flag[i]; rerender(); }
+
+/* ---------- Vérification ---------- */
+function verify(){
+  const { l, q, Q, st } = cur();
+  if(st.done || !canVerify(Q,st)) return;
+  if(ELEMENT_TYPES.includes(Q.type)) return itemVerify(l,q);
+  if(Q.type === 'hunt') return huntVerify(l,q);
+  let ok = false;
+  if(Q.type === 'multi') ok = Q.items.every((it,i) => it.ok === st.sel[i]);
+  if(Q.type === 'write') ok = writeOk(Q, st.val);
+  if(ok){
+    const first = st.attempts === 0;
+    resolve(l, q, first ? Q.pts : Q.pts/2, first ? 'correct' : 'hint', `<b class="t">${first ? '✅ Exact !' : '🔄 Bien corrigé !'}</b>${Q.ok}`, 'ok');
+  } else {
+    st.attempts++;
+    if(st.attempts === 1) firstMiss(st, `<b class="t">🤔 Pas encore…</b>💡 ${Q.hint}`);
+    else resolve(l, q, 0, 'shown', `<b class="t">👁 Voici la correction</b>${Q.explain}`, 'ko');
+  }
+  rerender();
+}
+
+function firstMiss(st, html){ st.fb = html; st.fbType = 'hint'; APP.streak = 0; APP.fx = 'shake'; sfx('bad'); }
+
+/* Exercices à éléments : verrouillage progressif (CONVENTIONS §3.8) */
+function elemInfo(Q,st){
+  switch(Q.type){
+    case 'zones': return { n:Q.items.length, ok:i => st.place[i] === Q.items[i].z, clear:i => { st.place[i] = null; } };
+    case 'match': return { n:Q.terms.length, ok:i => st.choice[i] === Q.terms[i].d, clear:i => { st.choice[i] = ''; } };
+    case 'order': return { n:Q.steps.length, ok:i => st.slots[i] === i, clear:i => { st.bounce.push(st.slots[i]); st.slots[i] = null; } };
+    case 'gaps':  return { n:Q._answers.length, ok:i => st.fill[i] !== null && Q._bank[st.fill[i]] === Q._answers[i], clear:i => { st.fill[i] = null; } };
+  }
+}
+function itemVerify(l,q){
+  const Q = getQ(l,q), st = getSt(l,q), E = elemInfo(Q,st);
+  st.attempts++;
+  const att = st.attempts;
+  for(let i = 0; i < E.n; i++){
+    if(st.lock[i]) continue;
+    if(E.ok(i)) st.lock[i] = att === 1 ? 'ok1' : 'ok2';
+    else if(att === 1){ E.clear(i); if(Q.type !== 'order') st.bounce.push(i); }
+    else st.lock[i] = 'ko';
+  }
+  const remaining = st.lock.filter(x => !x).length;
+  if(att === 1 && remaining > 0){
+    const good = E.n - remaining;
+    if(Q.type === 'gaps') st.active = nextEmptyGap(st);
+    const lead = good === 0 ? `Aucune réponse n'est encore juste, mais tu as un 2e essai.` : good === 1 ? `1 sur ${E.n} est juste : elle reste bloquée en vert.` : `${good} sur ${E.n} sont justes : elles restent bloquées en vert.`;
+    firstMiss(st, `<b class="t">✔️ ${lead}</b>${good ? 'Les autres sont à refaire. ' : ''}💡 ${Q.hint}`);
+    rerender();
+    return;
+  }
+  itemFinish(l,q);
+  rerender();
+}
+function itemFinish(l,q){
+  const Q = getQ(l,q), st = getSt(l,q), n = st.lock.length, unit = Q.pts / n;
+  let earned = 0, c1 = 0, c2 = 0, ko = 0;
+  st.lock.forEach(lk => { if(lk === 'ok1'){ earned += unit; c1++; } else if(lk === 'ok2'){ earned += unit/2; c2++; } else ko++; });
+  earned = Math.round(earned * 2) / 2;
+  const status = c1 === n ? 'correct' : ko === 0 ? 'hint' : 'shown';
+  const title = status === 'correct' ? '✅ Tout est juste du premier coup !' : status === 'hint' ? '🔄 Tout est corrigé !' : '👁 Voici la correction';
+  const detail = status === 'correct' ? '' : `<br><small>✅ ${c1} du premier coup · 🔄 ${c2} au 2e essai · ✏️ ${ko} corrigée${ko > 1 ? 's' : ''} en jaune</small>`;
+  resolve(l, q, earned, status, `<b class="t">${title}</b>${Q.explain}${detail}`, status === 'shown' ? 'ko' : 'ok');
+}
+function huntVerify(l,q){
+  const Q = getQ(l,q), st = getSt(l,q);
+  st.attempts++;
+  const att = st.attempts;
+  let alarms = 0;
+  Q.sentences.forEach((s,i) => {
+    if(st.lock[i] || !st.flag[i]) return;
+    if(s.err) st.lock[i] = att === 1 ? 'ok1' : 'ok2';
+    else { alarms++; st.flag[i] = false; st.alarmFlash.push(i); }
+  });
+  st.alarms += alarms;
+  const errs = Q.sentences.map((s,i) => s.err ? i : -1).filter(i => i >= 0);
+  const remaining = errs.filter(i => !st.lock[i]);
+  const alarmTxt = alarms ? ` ${alarms} phrase${alarms > 1 ? 's étaient justes' : ' était juste'} : fausse alerte, −${alarms} XP.` : '';
+  if(att === 1 && remaining.length > 0){
+    const found = errs.length - remaining.length;
+    firstMiss(st, `<b class="t">Tu as trouvé ${found} erreur${found > 1 ? 's' : ''} sur ${errs.length}.${alarmTxt}</b>💡 ${Q.hint}`);
+    rerender();
+    return;
+  }
+  if(remaining.length) remaining.forEach(i => { st.lock[i] = 'ko'; });
+  const unit = Q.pts / errs.length;
+  let pts = 0, c1 = 0, ko = 0;
+  errs.forEach(i => { if(st.lock[i] === 'ok1'){ pts += unit; c1++; } else if(st.lock[i] === 'ok2') pts += unit/2; else ko++; });
+  const earned = Math.max(0, Math.round((pts - st.alarms) * 2) / 2);
+  const status = c1 === errs.length ? 'correct' : ko === 0 ? 'hint' : 'shown';
+  const title = status === 'correct' ? '✅ Bien vu, tu as trouvé les 2 erreurs !' : status === 'hint' ? '🔄 Les 2 erreurs sont trouvées !' : '👁 Voici la correction';
+  resolve(l, q, earned, status, `<b class="t">${title}${alarmTxt}</b>${Q.explain}${st.alarms ? `<br><small>Fausses alertes au total : ${st.alarms} (−${st.alarms} XP).</small>` : ''}`, status === 'shown' ? 'ko' : 'ok');
+  rerender();
+}
+
+/* ---------- Résolution d'une question ---------- */
+function resolve(l,q,earned,status,fb,fbType){
+  const st = getSt(l,q);
+  if(st.done) return;
+  st.done = true; st.status = status; st.earned = earned; st.fb = fb; st.fbType = fbType;
+  APP.score += earned;
+  if(status === 'correct'){
+    APP.streak++; APP.bestStreak = Math.max(APP.bestStreak, APP.streak);
+    if([3,5,10].includes(APP.streak)) combo(APP.streak);
+    sfx('good');
+  } else {
+    APP.streak = 0;
+    if(status === 'shown'){ APP.fx = 'shake'; sfx('bad'); } else sfx('good');
+  }
+  if(earned > 0) reward(earned);
+  if(LEVELS[l].questions.every((_,i) => stStatus(l,i))) completeLevel(l);
+  checkRank();
+  checkBadges();
+}
+
+function completeLevel(l){
+  if(APP.completed.has(l)) return;
+  APP.completed.add(l);
+  sfx('level');
+  /* Tracking : arrêt du chronomètre du niveau et envoi (anti-doublon par session) */
+  if(!APP.sentLevels.has(l)){
+    APP.sentLevels.add(l);
+    const result = stopExerciseTimer(l);
+    if(result) sendResult(`Mission ${l+1} — ${LEVELS[l].title}`, result.points, LEVELS[l].maxPoints, result.temps);
+  }
+  APP.timerLevel = null;
+}
+
+/* ---------- Navigation ---------- */
+function goHub(){ if(APP.screen === 'welcome' && !APP.email && !TEST_MODE) { showEmailModal(); return; } setScreen('hub'); }
+function openLevel(l){
+  if(!isUnlocked(l)) return;
+  APP.level = l;
+  if(APP.completed.has(l)) setScreen('bilan'); else openBrief(l);
+}
+function openBrief(l){
+  APP.level = l;
+  if(!APP.completed.has(l) && APP.timerLevel !== l){ startExerciseTimer(l); APP.timerLevel = l; }
+  setScreen('brief');
+}
+function setPrediction(p){ APP.predictions[APP.level] = p; rerender(); }
+function startLevel(){
+  const l = APP.level;
+  if(!APP.predictions[l]) return;
+  const first = LEVELS[l].questions.findIndex((_,i) => !stStatus(l,i));
+  if(first < 0){ setScreen('bilan'); return; }
+  APP.q = first; setScreen('question');
+}
+function nextQuestion(){
+  const l = APP.level;
+  if(APP.q < LEVELS[l].questions.length - 1){ APP.q++; setScreen('question'); }
+  else setScreen('bilan');
+}
+
+/* ============================================================
+   6. BILANS
+   ============================================================ */
+function gradeOf(r){
+  if(r >= .85) return { g:'A', t:'Excellent', m:"Tu maîtrises très bien cette matière." };
+  if(r >= .65) return { g:'B', t:'Très bien', m:"La plupart des notions sont en place. Relis les explications des questions orange et rouges." };
+  if(r >= .45) return { g:'C', t:'Satisfaisant', m:"Tu es sur la bonne voie. Relis le rappel et les corrections avant de continuer." };
+  return { g:'D', t:'À retravailler', m:"Relis ton cours et les corrections, puis rejoue : tu vas progresser." };
+}
+function medalOf(r){ return r >= .9 ? '🏆' : r >= .7 ? '🥇' : r >= .5 ? '🥈' : '🥉'; }
+function predictionActual(l){
+  const s = levelStats(l);
+  if(s.c === s.n) return 'all';
+  if(s.c / s.n >= 0.7) return '3q';
+  return 'half';
+}
+function predictionMatch(l){
+  const order = ['half','3q','all'];
+  const p = APP.predictions[l]; if(!p) return null;
+  return order.indexOf(p) - order.indexOf(predictionActual(l));
+}
+
+function renderBilan(l){
+  const lv = LEVELS[l], s = levelStats(l);
+  if(!APP.completed.has(l)) return renderBrief(l);
+  const r = s.c / s.n, gr = gradeOf(r);
+  const pm = predictionMatch(l), p = PREDICTIONS.find(x => x.id === APP.predictions[l]);
+  let predTxt = '';
+  if(p){
+    const base = `Tu avais prédit <b>${p.short}</b> ; tu as réussi <b>${s.c}/${s.n}</b> du premier coup. `;
+    predTxt = base + (pm === 0 ? "Bonne estimation, tu te connais bien ! 🎯" : pm > 0 ? "Tu étais un peu trop optimiste : relis les corrections des questions ratées, et la prochaine fois ça ira mieux." : "Tu as fait mieux que prévu : tu peux avoir davantage confiance en toi !");
+  }
+  const rows = lv.questions.map((Q,i) => {
+    const st = APP.qs[key(l,i)];
+    const ic = st.status === 'correct' ? '✅' : st.status === 'hint' ? '🔄' : '👁';
+    return `<tr><td>${i+1}. ${TYPE_LABEL[Q.type]}</td><td class="n">${ic}</td><td class="n">${st.earned} / ${Q.pts}</td></tr>`;
+  }).join('');
+  const last = l === LEVELS.length - 1;
+  if(r >= .7) setTimeout(() => confetti(60), 150);
+  return `<section class="panel">
+    <div class="medal" aria-hidden="true">${medalOf(r)}</div>
+    <div class="grade">${gr.g} — ${gr.t}<small>Mission ${l+1} · ${lv.title}</small></div>
+    <p style="text-align:center;margin-top:8px;">${starsHTML(s.xp/s.max)} &nbsp; <b>${s.xp} / ${s.max} XP</b></p>
+    <p style="text-align:center;color:var(--text2);margin-top:6px;">${gr.m}</p>
+    <div class="kpis"><div class="kpi"><b style="color:var(--success)">${s.c}</b><span>✅ du 1er coup</span></div>
+      <div class="kpi"><b style="color:var(--orange)">${s.h}</b><span>🔄 au 2e essai</span></div>
+      <div class="kpi"><b style="color:var(--error)">${s.s}</b><span>👁 montrées</span></div></div>
+    <div class="legend"><span><span class="dot g"></span>Juste du 1er coup</span><span><span class="dot o"></span>Corrigée au 2e essai</span><span><span class="dot r"></span>Réponse montrée</span></div>
+    <table class="recap"><tr><th>Question</th><th style="text-align:center">Résultat</th><th style="text-align:center">XP</th></tr>${rows}</table>
+    ${predTxt ? `<div class="predline">🔮 ${predTxt}</div>` : ''}
+    <div class="btn-row">
+      <button class="btn ghost" onclick="goHub()">🗺️ Parcours</button>
+      ${last ? `<button class="btn gold" onclick="goHub()">🏁 Voir mon bilan final</button>` : `<button class="btn" onclick="openLevel(${l+1})">Mission suivante ➜</button>`}
+    </div>
+  </section>`;
+}
+
+function findInd(id){ for(const c of CRITERES) for(const i of c.indicateurs) if(i.id === id) return i; return null; }
+
+function bilanIndicateurs(){
+  const acc = {};
+  LEVELS.forEach((lv,l) => lv.questions.forEach((q,i) => {
+    const a = acc[q.ind] || (acc[q.ind] = { pts:0, max:0 });
+    a.max += q.pts;
+    a.pts += (APP.qs[l + '_' + i] && APP.qs[l + '_' + i].earned) || 0;
+  }));
+  const statut = r => r >= 0.8 ? 'atteint' : r >= 0.5 ? 'encours' : 'nonatteint';
+  return CRITERES.map(c => {
+    const inds = c.indicateurs.map(ind => { const a = acc[ind.id] || { pts:0, max:0 }; const r = a.max ? a.pts / a.max : 0; return Object.assign({}, ind, { ratio:r, statut:statut(r) }); });
+    const tot = c.indicateurs.reduce((t,ind) => { const a = acc[ind.id] || { pts:0, max:0 }; return { pts:t.pts + a.pts, max:t.max + a.max }; }, { pts:0, max:0 });
+    const r = tot.max ? tot.pts / tot.max : 0;
+    return { id:c.id, nom:c.nom, ratio:r, statut:statut(r), indicateurs:inds };
+  });
+}
+const STATUT_LABEL = { atteint:'✅ Atteint', encours:"🟠 En cours d'acquisition", nonatteint:'❌ Non atteint' };
+
+function renderFinal(){
+  let c = 0, h = 0, s = 0;
+  LEVELS.forEach((_,l) => { const x = levelStats(l); c += x.c; h += x.h; s += x.s; });
+  const r = c / TOTAL_Q, gr = gradeOf(r), rk = RANKS[rankIndex(APP.score)];
+  if(!APP.finalCelebrated){ APP.finalCelebrated = true; if(r >= .7) setTimeout(() => confetti(120), 200); }
+  const rows = LEVELS.map((lv,l) => { const x = levelStats(l); return `<tr><td>${lv.icon} ${lv.title}</td><td class="n">${x.c}</td><td class="n">${x.h}</td><td class="n">${x.s}</td><td class="n">${x.xp}/${x.max}</td><td class="n">${starsHTML(x.xp/x.max)}</td></tr>`; }).join('');
+  const B = bilanIndicateurs();
+  const allOk = B.every(cr => cr.indicateurs.every(i => i.statut === 'atteint'));
+  const crit = B.map(cr => `<div class="crit"><div class="crit-h"><span>${cr.nom}</span><span class="status ${cr.statut}">${STATUT_LABEL[cr.statut]} · ${Math.round(cr.ratio*100)} %</span></div>
+    ${cr.indicateurs.map(i => `<div class="ind ${i.statut}"><div class="crit-h" style="font-weight:600"><span>${i.texte}</span><span class="status ${i.statut}">${STATUT_LABEL[i.statut]}</span></div>
+      ${i.statut !== 'atteint' ? `<div class="revoir">📖 À revoir dans ton cours : <i>${i.chapitre}</i> — ${i.revoir}</div>` : ''}</div>`).join('')}</div>`).join('');
+  const date = new Date().toLocaleDateString('fr-BE', { day:'numeric', month:'long', year:'numeric' });
+  return `<section class="panel final fiche">
+    <div class="print-head"><b>L'entreprise — Partie 2 (3e P Vente)</b><br>Élève : ${playerName() || '………………'} ${APP.classe ? '· ' + APP.classe : ''} · ${date}</div>
+    <div class="medal" aria-hidden="true">${medalOf(r)}</div>
+    <div class="grade">${gr.g} — ${gr.t}<small>Bilan final du parcours</small></div>
+    <div class="kpis">
+      <div class="kpi"><b>${APP.score} / ${TOTAL_XP}</b><span>XP gagnés</span></div>
+      <div class="kpi"><b>${rk.icon} ${rk.name}</b><span>Rang atteint</span></div>
+      <div class="kpi"><b>🔥 ${APP.bestStreak}</b><span>Meilleure série</span></div>
+      <div class="kpi"><b>🏆 ${APP.badges.size}/${BADGES.length}</b><span>Badges</span></div>
+    </div>
+    <div class="legend"><span><span class="dot g"></span>Juste du 1er coup</span><span><span class="dot o"></span>Corrigée au 2e essai</span><span><span class="dot r"></span>Réponse montrée</span></div>
+    <table class="recap"><tr><th>Mission</th><th style="text-align:center">✅</th><th style="text-align:center">🔄</th><th style="text-align:center">👁</th><th style="text-align:center">XP</th><th style="text-align:center">Étoiles</th></tr>${rows}
+      <tr><td><b>Total</b></td><td class="n">${c}</td><td class="n">${h}</td><td class="n">${s}</td><td class="n">${APP.score}/${TOTAL_XP}</td><td class="n">${Math.round(r*100)} % du 1er coup</td></tr></table>
+    <h3 class="section-title" style="margin-top:22px">📋 Ce que tu maîtrises</h3>
+    ${allOk ? `<p class="predline">✅ Tous les objectifs sont atteints. Tu es prêt(e) pour la suite du cours !</p>` : `<p style="color:var(--text2);font-size:.9rem">Pour chaque objectif pas encore atteint, voici où le retrouver dans ton cours.</p>`}
+    ${crit}
+    <div class="btn-row no-print">
+      <button class="btn ghost" onclick="window.print()">🖨️ Imprimer mon bilan</button>
+      <button class="lb-btn app" onclick="openLB('app')">🏆 Classement</button>
+      <button class="lb-btn glob" onclick="openLB('global')">🌍 Général</button>
+      <button class="btn orange" onclick="restartGame()">🔁 Rejouer</button>
+    </div>
+  </section>`;
+}
+
+function restartGame(){
+  TRACKING.sessionId = new Date().toISOString();   // nouvelle session (SPEC §5.4)
+  resetState();
+  APP.globalTimerStart = Date.now();
+  setScreen('hub');
+}
+function resetState(){
+  APP.qs = {}; APP.score = 0; APP.streak = 0; APP.bestStreak = 0;
+  APP.completed = new Set(); APP.predictions = {}; APP.badges = new Set(); APP.rank = 0;
+  APP.finalCelebrated = false; APP.timerLevel = null; APP.sentLevels = new Set();
+  APP.exerciseStartTime = null; APP.exerciseTimes = {}; APP.exerciseScores = {}; APP.scoreBeforeExercise = 0;
+  FXQ.length = 0;
+}
+
+/* ============================================================
+   7. GAMIFICATION : rangs, badges, effets, sons
+   ============================================================ */
+const FXQ = []; let fxBusy = false;
+function enqueueFX(item){ FXQ.push(item); if(!fxBusy) nextFX(); }
+function nextFX(){
+  const it = FXQ.shift();
+  if(!it){ fxBusy = false; return; }
+  fxBusy = true;
+  if(it.type === 'rank') showRankUp(it.rank); else showBadge(it.badge);
+}
+function checkRank(){
+  const r = rankIndex(APP.score);
+  if(r > APP.rank){ APP.rank = r; enqueueFX({ type:'rank', rank:r }); }
+}
+function checkBadges(){
+  BADGES.forEach(b => { if(!APP.badges.has(b.id) && b.test()){ APP.badges.add(b.id); enqueueFX({ type:'badge', badge:b }); } });
+}
+function showRankUp(r){
+  const rk = RANKS[r];
+  document.getElementById('rankCard').innerHTML = `<span class="ri">${rk.icon}</span><h3>Promotion !</h3><h2>${rk.name}</h2>
+    <p>Tu as atteint ${Math.ceil(rk.th*TOTAL_XP)} XP. ${RANKS[r+1] ? `Prochain rang : ${RANKS[r+1].icon} ${RANKS[r+1].name}.` : 'Tu es au sommet du magasin !'}</p>
+    <button class="btn gold" id="rankClose" onclick="closeRankUp()">Continuer ➜</button>`;
+  document.getElementById('rankOverlay').style.display = 'flex';
+  sfx('level'); confetti(70);
+  setTimeout(() => { const b = document.getElementById('rankClose'); if(b) b.focus(); }, 50);
+}
+function closeRankUp(){ document.getElementById('rankOverlay').style.display = 'none'; nextFX(); }
+function showBadge(b){
+  const t = document.getElementById('toast');
+  t.innerHTML = `<span class="ti">${b.icon}</span><div><small>Badge débloqué !</small><b>${b.name}</b></div>`;
+  t.classList.add('show'); sfx('badge');
+  setTimeout(() => { t.classList.remove('show'); setTimeout(nextFX, 380); }, 3000);
+}
+
+let LAST_PT = null;
+document.addEventListener('pointerdown', e => { LAST_PT = { x:e.clientX, y:e.clientY }; }, true);
+function reward(earned){
+  const x = LAST_PT ? LAST_PT.x : window.innerWidth/2, y = LAST_PT ? LAST_PT.y : window.innerHeight/2;
+  const colors = ['#22d68a','#ffc940','#ff8a3d','#5aa9ff','#ffffff'];
+  for(let i = 0; i < 16; i++){
+    const p = document.createElement('div'); p.className = 'particle';
+    p.style.left = x + 'px'; p.style.top = y + 'px'; p.style.background = colors[i % colors.length];
+    document.body.appendChild(p);
+    const a = Math.random() * Math.PI * 2, d = 40 + Math.random() * 70;
+    if(p.animate) p.animate([{ transform:'translate(0,0) scale(1)', opacity:1 }, { transform:`translate(${Math.cos(a)*d}px,${Math.sin(a)*d}px) scale(.3)`, opacity:0 }], { duration:800, easing:'cubic-bezier(.2,.8,.2,1)' });
+    setTimeout(() => p.remove(), 820);
+  }
+  const f = document.createElement('div'); f.className = 'floatxp'; f.textContent = '+' + earned + ' XP';
+  f.style.left = (x - 20) + 'px'; f.style.top = (y - 30) + 'px';
+  document.body.appendChild(f); setTimeout(() => f.remove(), 1000);
+}
+function combo(n){
+  const txt = n >= 10 ? '⚡ INARRÊTABLE ×' + n : n >= 5 ? '🔥 EN FEU ×' + n : '🔥 COMBO ×' + n;
+  const c = document.createElement('div'); c.className = 'combo'; c.textContent = txt;
+  document.body.appendChild(c); setTimeout(() => c.remove(), 1150);
+}
+function confetti(n){
+  const colors = ['#22d68a','#ffc940','#ff8a3d','#5aa9ff','#ff4d6d','#ffffff'];
+  for(let i = 0; i < n; i++){
+    const c = document.createElement('div'); c.className = 'confetti';
+    c.style.left = Math.random()*100 + 'vw'; c.style.background = colors[i % colors.length];
+    c.style.animationDuration = (2 + Math.random()*1.8) + 's'; c.style.animationDelay = (Math.random()*.5) + 's';
+    document.body.appendChild(c); setTimeout(() => c.remove(), 4500);
+  }
+}
+
+/* Sons Web Audio — coupés par défaut (CONVENTIONS §4.10) */
+let AC = null;
+function toggleSound(){
+  APP.sound = !APP.sound;
+  const b = document.getElementById('soundBtn');
+  b.textContent = APP.sound ? '🔊' : '🔇';
+  b.setAttribute('aria-label', APP.sound ? 'Couper le son' : 'Activer le son');
+  if(APP.sound && !AC){ try{ AC = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ AC = null; } }
+  if(APP.sound) sfx('good');
+}
+function tone(freq, start, dur, type, vol){
+  if(!AC) return;
+  const o = AC.createOscillator(), g = AC.createGain(), t = AC.currentTime + start;
+  o.type = type || 'sine'; o.frequency.value = freq;
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol || 0.15, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t + dur + 0.05);
+}
+function sfx(kind){
+  if(!APP.sound || !AC) return;
+  if(kind === 'good'){ tone(660,0,.12); tone(990,.1,.18); }
+  else if(kind === 'bad'){ tone(220,0,.18,'triangle',.12); }
+  else if(kind === 'badge'){ tone(784,0,.12); tone(988,.1,.12); tone(1319,.2,.25); }
+  else if(kind === 'level'){ [523,659,784,1047].forEach((f,i) => tone(f, i*.1, .2)); }
+}
+
+/* ============================================================
+   8. TRACKING (SPEC_Tracking_Eleves_v5)
+   ============================================================ */
+const TEST_MODE = /[?&]test=1/.test(location.search);
+const TRACKING = {
+  appName: "L'entreprise (3P Vente) — Partie 2",  // nom exact et constant
+  totalNiveaux: LEVELS.length,                     // 3 missions
+  sessionId: null,
+  scriptUrl: "https://script.google.com/macros/s/AKfycbx9bRMVuHU2mgFLii1KcQXD3LdZahnDH1rf1cWv9RuDvQAt0l3VtLtxzmbH7MtpJWRjfA/exec"
+};
+
+function showEmailModal(){
+  const overlay = document.getElementById('emailOverlay');
+  overlay.style.display = 'flex';
+  const input = document.getElementById('emailInput');
+  const saved = localStorage.getItem('student_email');
+  if(saved) input.value = saved;
+  input.focus();
+  document.getElementById('emailError').textContent = '';
+}
+
+function validateEmail(){
+  const input = document.getElementById('emailInput');
+  const btn = document.getElementById('emailBtn');
+  const errDiv = document.getElementById('emailError');
+  const email = input.value.trim().toLowerCase();
+  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    errDiv.textContent = '⚠️ Entre une adresse email valide.';
+    input.style.borderColor = '#ff4060';
+    return;
+  }
+  btn.textContent = '⏳ Vérification…'; btn.disabled = true;
+  errDiv.textContent = ''; input.style.borderColor = '';
+
+  const cbName = '_emailCb_' + Date.now();
+  const timeout = setTimeout(() => {
+    delete window[cbName];
+    const s = document.getElementById(cbName); if(s) s.remove();
+    errDiv.textContent = '⚠️ Connexion impossible. Vérifie ta connexion internet.';
+    btn.textContent = '✅ Vérifier et commencer'; btn.disabled = false;
+  }, 10000);
+
+  window[cbName] = function(resp){
+    clearTimeout(timeout); delete window[cbName];
+    const s = document.getElementById(cbName); if(s) s.remove();
+    btn.textContent = '✅ Vérifier et commencer'; btn.disabled = false;
+    if(resp && resp.found){
+      const oldEmail = localStorage.getItem('student_email');
+      localStorage.setItem('student_email', email);
+      localStorage.setItem('student_classe', resp.classe || '');
+      APP.email = email; APP.classe = resp.classe || '';
+      if(oldEmail && oldEmail !== email) resetProgression();
+      TRACKING.sessionId = new Date().toISOString();
+      document.getElementById('emailOverlay').style.display = 'none';
+      startGlobalTimer();
+      onEmailValidated();
+    } else {
+      errDiv.textContent = "⚠️ Cette adresse email n'est pas enregistrée. Vérifie l'orthographe ou demande à ton professeur de t'ajouter à la liste.";
+      input.style.borderColor = '#ff4060';
+    }
+  };
+  const s = document.createElement('script');
+  s.id = cbName;
+  s.src = `${TRACKING.scriptUrl}?action=check_email&email=${encodeURIComponent(email)}&callback=${cbName}`;
+  s.onerror = () => {
+    clearTimeout(timeout); delete window[cbName]; s.remove();
+    errDiv.textContent = '⚠️ Erreur de connexion au serveur.';
+    btn.textContent = '✅ Vérifier et commencer'; btn.disabled = false;
+  };
+  document.body.appendChild(s);
+}
+function onEmailValidated(){ APP.screen = 'welcome'; renderScreen(); renderNav(); }
+
+function resetProgression(){ resetState(); console.log('[TRACKING] Progression réinitialisée (nouvel email)'); }
+
+function startGlobalTimer(){
+  APP.globalTimerStart = Date.now();
+  const el = document.getElementById('globalTimer'); if(el) el.style.display = 'inline';
+  if(APP.globalTimerInterval) clearInterval(APP.globalTimerInterval);
+  APP.globalTimerInterval = setInterval(updateTimerDisplay, 1000);
+  updateTimerDisplay();
+}
+function updateTimerDisplay(){
+  const el = document.getElementById('globalTimer');
+  if(!el || !APP.globalTimerStart) return;
+  const elapsed = Math.floor((Date.now() - APP.globalTimerStart) / 1000);
+  el.textContent = '⏱️ ' + String(Math.floor(elapsed/60)).padStart(2,'0') + ':' + String(elapsed%60).padStart(2,'0');
+}
+function formatTime(sec){ const m = Math.floor(sec/60), s = sec % 60; return m > 0 ? m + 'm ' + String(s).padStart(2,'0') + 's' : s + 's'; }
+
+/* Chronomètre invisible du niveau : démarre à l'ouverture du briefing (SPEC §7.6) */
+function startExerciseTimer(exIdx){ APP.exerciseStartTime = Date.now(); APP.scoreBeforeExercise = APP.score || 0; }
+function stopExerciseTimer(exIdx){
+  if(!APP.exerciseStartTime) return null;
+  const tempsSec = Math.round((Date.now() - APP.exerciseStartTime) / 1000);
+  APP.exerciseTimes[exIdx] = tempsSec; APP.exerciseStartTime = null;
+  const deltaPoints = (APP.score || 0) - APP.scoreBeforeExercise;
+  APP.exerciseScores[exIdx] = deltaPoints;
+  return { points:deltaPoints, temps:tempsSec };
+}
+
+function sendResult(niveau, points, pointsMax, temps){
+  if(!APP.email) return;
+  const payload = { email:APP.email, classe:APP.classe, app:TRACKING.appName, niveau:niveau, points:points,
+    pointsMax:pointsMax, temps:temps, totalNiveaux:TRACKING.totalNiveaux, sessionId:TRACKING.sessionId };
+  console.log('[TRACKING] Envoi:', payload);
+  if(TEST_MODE){ (window.__SENT = window.__SENT || []).push(payload); return; }
+  fetch(TRACKING.scriptUrl, { method:"POST", mode:"no-cors", headers:{ "Content-Type":"text/plain" }, body:JSON.stringify(payload) })
+    .catch(err => console.warn('[TRACKING] Erreur:', err));
+}
+
+let currentLBTab = 'app';
+function openLB(tab){ document.getElementById('lbOverlay').style.display = 'block'; switchLBTab(tab || 'app'); }
+function closeLB(){ document.getElementById('lbOverlay').style.display = 'none'; }
+function switchLBTab(tab){
+  currentLBTab = tab;
+  const btnApp = document.getElementById('lbTabApp'), btnGlobal = document.getElementById('lbTabGlobal');
+  if(tab === 'app'){
+    btnApp.style.background = 'var(--accent,#22d68a)'; btnApp.style.color = '#0f1117';
+    btnGlobal.style.background = 'transparent'; btnGlobal.style.color = 'var(--orange,#ff8a3d)';
+  } else {
+    btnGlobal.style.background = 'var(--orange,#ff8a3d)'; btnGlobal.style.color = '#0f1117';
+    btnApp.style.background = 'transparent'; btnApp.style.color = 'var(--accent,#22d68a)';
+  }
+  const cl = APP.classe ? ` (${APP.classe})` : '';
+  document.getElementById('lbTitle').textContent = tab === 'app' ? `🏆 Classement — ${TRACKING.appName}${cl}` : `🌍 Classement général${cl}`;
+  fetchLeaderboard(tab);
+}
+function fetchLeaderboard(tab){
+  const content = document.getElementById('lbContent');
+  content.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2,#999);">⏳ Chargement…</div>';
+  const action = tab === 'app' ? 'leaderboard_app' : 'leaderboard_global';
+  const cbName = '_lbCb_' + Date.now();
+  const timeout = setTimeout(() => {
+    delete window[cbName]; const s = document.getElementById(cbName); if(s) s.remove();
+    content.innerHTML = '<div style="text-align:center;padding:40px;"><div style="color:#ff4060;margin-bottom:12px;">⚠️ Connexion impossible</div><button onclick="fetchLeaderboard(\''+tab+'\')" style="padding:8px 20px;border-radius:8px;border:1px solid var(--border,#333);background:var(--bg3,#111);color:var(--text,#eee);cursor:pointer;font-family:inherit;">Réessayer</button></div>';
+  }, 10000);
+  window[cbName] = function(resp){
+    clearTimeout(timeout); delete window[cbName];
+    const s = document.getElementById(cbName); if(s) s.remove();
+    const lbData = resp && (resp.leaderboard || resp.data);
+    if(!lbData || lbData.length === 0){
+      content.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2,#999);">🏁 Aucun résultat pour le moment</div>';
+      return;
+    }
+    renderLeaderboard(lbData, tab);
+  };
+  let url = `${TRACKING.scriptUrl}?action=${action}&callback=${cbName}&mode=last`;
+  if(tab === 'app') url += `&app=${encodeURIComponent(TRACKING.appName)}`;
+  if(APP.classe) url += `&classe=${encodeURIComponent(APP.classe)}`;
+  const s = document.createElement('script');
+  s.id = cbName; s.src = url;
+  s.onerror = () => { clearTimeout(timeout); delete window[cbName]; s.remove(); content.innerHTML = '<div style="text-align:center;padding:40px;color:#ff4060;">⚠️ Erreur de connexion</div>'; };
+  document.body.appendChild(s);
+}
+function renderLeaderboard(data, tab){
+  const content = document.getElementById('lbContent');
+  const myEmail = (APP.email || '').toLowerCase();
+  if(tab === 'global' && data.length > 0){
+    data = data.slice().sort((a,b) => {
+      const pctA = a.pct != null ? a.pct : (a.pourcentage || 0), pctB = b.pct != null ? b.pct : (b.pourcentage || 0);
+      if(pctB !== pctA) return pctB - pctA;
+      return (a.totalTemps || a.totalTime || 0) - (b.totalTemps || b.totalTime || 0);
+    });
+    data.forEach((entry,i) => { entry.rang = i + 1; });
+  }
+  const me = data.find(r => (r.email || '').toLowerCase() === myEmail);
+  let html = '';
+  if(me){
+    const pct = me.pct != null ? me.pct : (me.pourcentage != null ? me.pourcentage : 0);
+    const count = tab === 'app' ? (me.niveauxCompletes || me.niveaux || 0) : (me.appsCompletes || me.apps || 0);
+    const total = tab === 'app' ? (me.totalNiveaux || 0) : (me.totalPossibleNiveaux || 0);
+    const label = tab === 'app' ? 'niveaux' : 'apps';
+    const prog = total > 0 ? count + '/' + total + ' ' + label : count + ' ' + label;
+    html += `<div style="background:rgba(34,214,138,0.08);border:1px solid rgba(34,214,138,0.3);border-radius:12px;padding:16px;margin-bottom:16px;display:flex;justify-content:space-around;text-align:center;gap:6px;flex-wrap:wrap;">
+      <div><div style="font-size:1.3rem;font-weight:800;color:var(--accent,#22d68a);">#${me.rang}</div><div style="font-size:0.7rem;color:var(--text2,#999);">RANG</div></div>
+      <div><div style="font-size:1.3rem;font-weight:800;">${me.totalPoints}</div><div style="font-size:0.7rem;color:var(--text2,#999);">POINTS</div></div>
+      <div><div style="font-size:1.3rem;font-weight:800;color:${pct>=80?'#22d68a':pct>=50?'#ff8a3d':'#ff4060'};">${pct}%</div><div style="font-size:0.7rem;color:var(--text2,#999);">RÉUSSITE</div></div>
+      <div><div style="font-size:1.3rem;font-weight:800;color:var(--text2,#999);">${prog}</div><div style="font-size:0.7rem;color:var(--text2,#999);">PROGRESSION</div></div>
+    </div>`;
+  }
+  const medals = ['🥇','🥈','🥉'];
+  html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:0.85rem;"><tr style="border-bottom:1px solid var(--border,#333);"><th style="text-align:left;padding:8px 4px;color:var(--text2,#999);font-size:0.72rem;">#</th><th style="text-align:left;padding:8px 4px;color:var(--text2,#999);font-size:0.72rem;">Élève</th><th style="text-align:left;padding:8px 4px;color:var(--text2,#999);font-size:0.72rem;">Progression</th><th style="text-align:right;padding:8px 4px;color:var(--text2,#999);font-size:0.72rem;">Pts</th><th style="text-align:right;padding:8px 4px;color:var(--text2,#999);font-size:0.72rem;">%</th><th style="text-align:right;padding:8px 4px;color:var(--text2,#999);font-size:0.72rem;">Temps</th></tr>';
+  data.forEach(row => {
+    const r = row.rang || 0;
+    const name = (row.email || '').split('@')[0].split(/[._-]/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    const pct = row.pct != null ? row.pct : (row.pourcentage != null ? row.pourcentage : 0);
+    const temps = row.totalTemps || row.totalTime || 0;
+    const count = tab === 'app' ? (row.niveauxCompletes || row.niveaux || 0) : (row.appsCompletes || row.apps || 0);
+    const total = tab === 'app' ? (row.totalNiveaux || 0) : (row.totalPossibleNiveaux || 0);
+    const w = total > 0 ? Math.min(100, Math.round(count / total * 100)) : 0;
+    const isMe = (row.email || '').toLowerCase() === myEmail;
+    const pctC = pct >= 80 ? '#22d68a' : pct >= 50 ? '#ff8a3d' : '#ff4060';
+    let tStr = '—'; if(temps > 0){ const m = Math.floor(temps/60), s = temps % 60; tStr = m > 0 ? m + 'm' + String(s).padStart(2,'0') + 's' : s + 's'; }
+    html += `<tr style="border-bottom:1px solid rgba(255,255,255,0.03);background:${isMe ? 'rgba(34,214,138,0.08)' : 'transparent'};"><td style="padding:8px 4px;font-weight:700;">${r <= 3 && r > 0 ? medals[r-1] : r}</td><td style="padding:8px 4px;${isMe ? 'font-weight:800;color:var(--accent,#22d68a);' : ''}">${name}</td><td style="padding:8px 4px;min-width:80px;"><div style="height:6px;border-radius:4px;background:var(--bg3,#111);"><div style="height:100%;width:${w}%;border-radius:4px;background:var(--accent,#22d68a);"></div></div><div style="font-size:.68rem;color:var(--text2,#999);">${count}${total ? '/' + total : ''}</div></td><td style="padding:8px 4px;text-align:right;font-weight:700;color:var(--accent,#22d68a);">${row.totalPoints}</td><td style="padding:8px 4px;text-align:right;font-weight:700;color:${pctC};">${pct}%</td><td style="padding:8px 4px;text-align:right;color:var(--text2,#999);font-family:monospace;font-size:0.78rem;">${tStr}</td></tr>`;
+  });
+  html += '</table></div>';
+  content.innerHTML = html;
+}
+
+/* ============================================================
+   9. DÉMARRAGE
+   ============================================================ */
+function init(){
+  renderScreen(); renderNav(); updateHUD();
+  if(!TEST_MODE) showEmailModal();   // TOUJOURS au lancement (SPEC §7.4)
+}
+init();
+</script>
+</body>
+</html>
